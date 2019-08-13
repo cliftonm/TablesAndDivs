@@ -1,0 +1,264 @@
+<style>
+    .clear {
+        clear:both; 
+    }
+
+    .border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    .quarter {
+        width: 25%; 
+    }
+    
+    .half {
+        width: 50%; 
+    }
+
+    .w15p {
+        width: 15%;
+    }
+
+    .w33p {
+        width: 33%;
+    }
+
+    .h100p {
+        height: 100%;
+    }
+
+    .scrolly {
+        overflow-y: auto;
+    }
+
+    .h100px {
+        height: 100px;
+    }
+
+    .w100px {
+        width: 100px;
+    }
+
+    .m10 {
+        margin-left:10px;
+    }
+
+    .inline {
+        display: inline-block;
+        padding: 0;
+        margin: 0;
+    }
+
+    .left {
+        float: left;
+    }
+
+    .center {
+        margin-left:auto;
+        margin-right:auto;
+    }
+
+    .pbottom10 {
+        padding-bottom:10px;
+    }
+
+    .aleft {
+        text-align:left;
+    }
+
+    .fleft {
+        float:left;
+        padding: 0;
+        margin: 0;
+    }
+
+    .fright {
+        float:right;
+    }
+
+    .taleft {
+        text-align: left;
+    }
+
+    .tacenter {
+        text-align: center;
+    }
+
+    .taright {
+        text-align: right;
+    }
+
+    .w40p {
+        width:40%
+    }
+
+    p {
+        margin-bottom: 2px;
+    }
+
+    .vatop {
+        display: table-cell;
+        vertical-align: top;
+    }
+
+    .vamiddle {
+        display: table-cell;
+        vertical-align: middle;
+    }
+
+    .vabottom {
+        display: table-cell;
+        vertical-align: bottom;
+   }
+
+   .parent {display: table;}
+
+  .child-top-left {
+     display: table-cell;
+   }
+
+  .child-middle-center {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+  .child-bottom-right {
+    display: table-cell;
+    vertical-align: bottom;
+    text-align: right;
+}
+
+  .wauto {
+    width: auto;
+  }
+
+</style>
+<body>
+  <p>Two inline divs:</p>
+  <div class='border1 quarter inline'>Div 1</div>
+  <div class='border1 quarter inline m10'>Div 2</div>
+
+  <div class='clear pbottom10'></div>
+
+  <p>Two floating left divs:</p>
+    <div class='border1 quarter fleft'>Div 1</div>
+    <div class='border1 quarter fleft m10'>Div 2</div>
+  
+    <div class='clear pbottom10'></div>
+
+<p>Two inline-block divs:</p>
+James<!--
+--><div class='border1 quarter inline'>Div 1</div>Tiberius<!--
+--><div class='border1 quarter inline'>Div 2</div> Kirk
+
+<p>Two float divs:</p>
+James <div class='border1 quarter fleft'>Div 1</div>Tiberius
+<div class='border1 quarter fleft'>Div 2</div> Kirk
+
+<div class='clear pbottom10'></div>
+
+    <p>Left, centered, and right floating divs:<br>
+        Note the centered div must come last so the left and right<br>
+        margins can be computed.  Furthermore, we can't use "inline-block",<br>
+        we have to use "float."</p>
+  <div class='border1 fleft quarter'>Left</div>
+  <div class='border1 fright quarter taright'>Right</div>
+  <div class='border1 center tacenter'>Center</div>
+
+  <div class='clear pbottom10'></div>
+
+  <p>Not what we want using inline-block</p>
+  <div class='border1 inline fleft quarter'>Left</div>
+  <div class='border1 inline center quarter tacenter'>Center</div>
+  <div class='border1 inline fright quarter taright'>Right</div>
+
+  <div class='clear pbottom10'></div>
+
+  <p>Inner divs:</p>
+  <div class='border1 fleft quarter'>Left</div>
+  <div class='border1 fright quarter taright'>Right</div>
+  <div class='border1 center tacenter'>
+        <div class='border1 fleft taleft w15p'>Left</div>
+        <div class='border1 fright w15p taright'>Right</div>
+        <div class='border1 center tacenter'>Center</div>
+   </div>
+
+   <div class='clear pbottom10'></div>
+
+   <p>Inner divs with content that wraps:</p>
+   <div class='border1 fleft quarter'>Left</div>
+   <div class='border1 fright right quarter taright'>Right</div>
+   <div class='border1 center tacenter'>
+         <div class='border1 fleft taleft w15p'>Left: Some long text that forces a line wrap.</div>
+         <div class='border1 fright w15p right taright'>Right: Some long text that forces a line wrap.</div>
+         <div class='border1 center tacenter'>Center: Some long text that forces a line wrap.</div>
+    </div>
+    <div class='clear border1'>Foobar</div>
+ 
+    <div class='clear pbottom10'></div>
+
+    <p>Playing with wrapper and inner widths:</p>
+    <div class='border1 fleft quarter'>Left</div>
+    <div class='border1 fright right quarter taright'>Right</div>
+    <div class='border1 center tacenter w40p'>
+          <div class='border1 fleft taleft w40p'>Left: Some long text that forces a line wrap.</div>
+          <div class='border1 fright right taright w40p'>Right: Some long text that forces a line wrap.</div>
+          <div class='border1 center tacenter'>Center: Some long text that forces a line wrap.</div>
+     </div>
+
+     <div class='clear pbottom10'></div>
+
+     <!-- https://vanseodesign.com/css/vertical-centering/ -->
+     <p>Child element poisitioning:</p>
+     <div class='parent border1 fleft w33p h100px'>
+            <div class="child-top-left"><button>Button A</button></div>
+    </div>
+    <div class='parent border1 fleft w33p h100px'>
+            <div class="child-middle-center"><button>Button B</button></div>
+    </div>
+    <div class='parent border1 fleft w33p h100px'>
+            <div class="child-bottom-right"><button>Button C</button></div>
+    </div>
+
+    <div class='clear pbottom10'></div>
+
+    <p>Left and right divs of fixed width:</p>
+    <div class='parent border1 fleft w100px h100px'>
+      <div class="child-top-left"><button>Button A</button></div>
+   </div>
+   <div class='parent border1 fleft h100px' style='width: calc(100% - 206px);'>
+     <div class="child-middle-center"><button>Button B</button></div>
+   </div>
+   <div class='parent border1 fleft w100px h100px'>
+     <div class="child-bottom-right"><button>Button C</button></div>
+   </div>
+
+   <div class='clear pbottom10'></div>
+
+   <p>Left div scrolling:</p>
+   <div class='parent border1 fleft w100px h100px'>
+     <div class="child-top-left">
+         <div class='scrolly h100p'>
+           <p>Menu Item 1</p>
+           <p>Menu Item 2</p>
+           <p>Menu Item 3</p>
+           <p>Menu Item 4</p>
+           <p>Menu Item 5</p>
+           <p>Menu Item 6</p>
+         </div>
+     </div>
+  </div>
+  <div class='parent border1 fleft h100px' style='width: calc(100% - 206px);'>
+    <div class="child-middle-center"><button>Button B</button></div>
+  </div>
+  <div class='parent border1 fleft w100px h100px'>
+    <div class="child-bottom-right"><button>Button C</button></div>
+  </div>
+  <div class='clear pbottom10'></div>
+
+   <p>abc</p>
+
+</body>
+

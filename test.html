@@ -1,0 +1,63 @@
+<!-- https://vanseodesign.com/css/vertical-centering/ -->
+<style>
+#parent {display: table;}
+
+#child-top-left {
+    display: table-cell;
+}
+
+#child-middle-center {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+#child-bottom-right {
+    display: table-cell;
+    vertical-align: bottom;
+    text-align: right;
+}
+
+.w100p {
+        width: 100%;
+    }
+
+    .border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+
+</style>
+
+<body>
+    <div id="parent" style='float:left; border-style:solid; border-width: 1px; border-color:black; width:150px; height:150px'>
+            <div id="child-top-left"><button>Button A</button></div>
+    </div>
+    <div id="parent" style='float:left; border-style:solid; border-width: 1px; border-color:black; width:150px; height:150px'>
+            <div id="child-middle-center"><button>Button B</button></div>
+    </div>
+    <div id="parent" style='border-style:solid; border-width: 1px; border-color:black; width:150px; height:150px'>
+            <div id="child-bottom-right"><button>Button C</button></div>
+    </div>
+
+
+    <table class='w100p noborders' style='table-layout:fixed'>
+        <col width='75px'/>
+        <col width='25%'/>
+        <col width='75px'/>
+        <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+        </tr>
+        <tr class='h100px'>
+            <td class='border1 vatop'><button>Button A</button></td>
+            <td class='border1 tacenter vacenter'><button>Button B</button></td>
+            <td class='border1 taright vabottom'><button>Button C</button></td>
+        </tr>
+    </table>  
+
+</body>
+
+

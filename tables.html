@@ -1,0 +1,224 @@
+<style>
+    .border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    table {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    th {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    tr {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    td {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    .w33p {
+        width: 33%;
+    }
+
+    .w100px {
+        width: 100px;
+    }
+
+    .wauto {
+        width: auto;
+    }
+
+    .h100px {
+        height: 100px;
+    }
+
+    .w100p {
+        width: 100%;
+    }
+
+    .w200px {
+        width: 200px;
+    }
+
+    .taleft {
+        text-align: left;
+    }
+
+    .tacenter {
+        text-align: center;
+    }
+
+    .taright {
+        text-align: right;
+    }
+
+    .pbottom10 {
+        padding-bottom:10px;
+    }
+
+    .vatop {
+        vertical-align: top;
+    }
+
+    .vamiddle {
+        vertical-align: middle;
+    }
+
+    .vabottom {
+        vertical-align: bottom;
+    }
+
+    .noborders {
+        border-collapse: collapse;    
+    }
+
+    .h100p {
+        height: 100%;
+    }
+
+    .scrolly {
+        overflow-y: auto;
+    }
+
+    p {
+        margin-bottom: 2px;
+    }
+
+</style>
+<body>
+  <p>Table without specifying column widths:</p>
+  <table class='w100p'>
+      <tr>
+          <th>A</th>
+          <th>B</th>
+          <th>C</th>
+      </tr>
+      <tr>
+          <td class='border1'>Left</td>
+          <td class='border1 tacenter'>Center</td>
+          <td class='border1 taright'>Right</td>
+      </tr>
+  </table>  
+  <div class='pbottom10'></div>
+  <p>Table with column widths as percents:</p>
+  <table class='w100p'>
+        <tr>
+            <th>A</th>
+            <th>B</th>
+            <th>C</th>
+        </tr>
+        <tr>
+            <td class='border1 w33p'>Left</td>
+            <td class='border1 w33p tacenter'>Center</td>
+            <td class='border1 w33p taright'>Right</td>
+        </tr>
+    </table>  
+
+    <div class='pbottom10'></div>
+
+    <p>With content that wraps:<br>
+       Notice how the TD centers the content vertically.</p>
+    <table class='w100p'>
+            <tr>
+                <th>A</th>
+                <th>B</th>
+                <th>C</th>
+            </tr>
+            <tr>
+                <td class='border1 w33p'>Left: Some long text that forces a line wrap. And some more text that wraps 2 line 3.</td>
+                <td class='border1 w33p tacenter'>Center</td>
+                <td class='border1 w33p taright'>Right: Some long text that forces a line wrap.</td>
+            </tr>
+        </table>  
+         
+        <div class='pbottom10'></div>
+
+        <p>TR with height and TD with vertical alignment:</p>
+        <table class='w100p'>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+                <tr class='h100px'>
+                    <td class='border1 w33p vatop'>Left</td>
+                    <td class='border1 tacenter vacenter'>Center</td>
+                    <td class='border1 taright vabottom'>Right</td>
+                </tr>
+            </table>  
+         
+            <div class='pbottom10'></div>
+
+            <p>Tables instead of Divs</p>
+            <table class='w100p noborders'>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+                <tr class='h100px'>
+                    <td class='border1 vatop'><button>Button A</button></td>
+                    <td class='border1 tacenter vacenter'><button>Button B</button></td>
+                    <td class='border1 taright vabottom'><button>Button C</button></td>
+                </tr>
+            </table>  
+
+            <div class='pbottom10'></div>
+
+            <p>Three column with left and right in fixed pixels</p>
+            <table class='w100p noborders' style='table-layout:fixed'>
+                <col class='w100px'/>
+                <col class='wauto'/>
+                <col class='w100px'/>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+                <tr class='h100px'>
+                    <td class='vatop'><button>Button A</button></td>
+                    <td class='tacenter vacenter'><button>Button B</button></td>
+                    <td class='taright vabottom'><button>Button C</button></td>
+                </tr>
+            </table>  
+
+
+            <div class='pbottom10'></div>
+
+            <p>Column Scrolling</p>
+            <table class='w100p noborders' style='table-layout:fixed'>
+                <col class='w100px'/>
+                <col class='wauto'/>
+                <col class='w100px'/>
+                <tr>
+                    <th>A</th>
+                    <th>B</th>
+                    <th>C</th>
+                </tr>
+                <tr class='h100px'>
+                    <td class='vatop'>
+                            <div class='scrolly h100px'>
+                                    <p>Menu Item 1</p>
+                                    <p>Menu Item 2</p>
+                                    <p>Menu Item 3</p>
+                                    <p>Menu Item 4</p>
+                                    <p>Menu Item 5</p>
+                                    <p>Menu Item 6</p>
+                                  </div>
+                                             </td>
+                    <td class='tacenter vacenter'><button>Button B</button></td>
+                    <td class='taright vabottom'><button>Button C</button></td>
+                </tr>
+            </table>  
+            <p></p>
+
+           </body>
+

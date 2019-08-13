@@ -1,0 +1,182 @@
+<head>
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+</head>
+
+<style>
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
+    :root {
+        --propertyWidth: 200px;
+    }
+
+    .noborders {
+        border-collapse: collapse;    
+    }
+
+    .border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    div {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    table {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    th {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    tr {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    td {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    .fullscreen {
+        height: 100%;
+        width: 100%; 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        left: 0; 
+        right: 0;
+    }
+
+    .fixed {
+        table-layout: fixed;
+    }
+
+    .fullscreenv {
+        height: 100%;
+        width: calc(100% - (var(--propertyWidth) + 2px)); 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        left: 0; 
+        right: 0;
+    }
+
+    .editorhw {
+        width: calc(100% - var(--propertyWidth));
+    }
+
+    .properties {
+        width: var(--propertyWidth);
+    }
+
+    .taeditor {
+        height: 100%;
+        width: 100%;
+        resize: none;
+        padding: 0;
+        margin: 0;
+        white-space:normal;   /* or auto? */
+        overflow: auto;
+    }
+
+    .h100p {
+        height: 100%;
+    }
+
+    .text-bold {
+        font-weight: bold;
+    }
+
+    .mw1px {
+        max-width: 1px;
+    }
+
+    .preview {
+        overflow: auto;
+        white-space: normal;
+    }
+
+</style>
+
+<body>
+    <!-- 3 Horizontal panels -->
+
+
+    <table class='fullscreen noborders fixed'>
+        <tr>
+            <td class='editorhw'>
+                <div class='h100p'>
+                    <textarea id='editor' class='taeditor'></textarea>
+                </div>
+            </td>
+            <td class='mw1px'>
+                <div class='preview h100p' id='preview'></div>
+            </td>
+            <td class='properties'>Properties</td>
+        </tr>
+    </table>
+
+
+    <!-- top and bottom editor and preview with properties sidebar -->
+    <!--
+    <table class='fullscreen noborders'>
+        <tr>
+            <td>
+                <table class='fullscreenv noborders'>
+                    <tr>
+                        <td>
+                            <div class='h100p'>
+                                <textarea class='taeditor' id='editor'></textarea>
+                            </div>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td class='mw1px'>  <!-- Note This!!! -->
+                            <div class='preview h100p' id='preview'></div>
+                        </td>
+                    </tr>
+                </table>
+            </td>
+            <td class='properties'>
+                <div class='h100p'>
+                    <span class='text-bold' id='elementName'></span>
+                </div>
+            </td>
+        </tr>
+    </table>
+-->
+</body>
+
+<script>
+$(document).ready(() => initialize());
+
+function wireUpEvents() {
+    $('#editor').keyup(event => editorKeyPress(event.which));
+    $('#preview').mouseover(event => previewMouseOver(event.target));
+}
+
+function initialize() {
+    wireUpEvents();
+}
+
+function editorKeyPress(key) {
+    let editorText = $('#editor').val();
+    $('#preview').html(editorText);
+}
+
+function previewMouseOver(element) {
+    // Ignore the preview box itself.
+    if (element.id != 'preview') {
+        let tagName = element.tagName;
+        $('#elementName').text(tagName);
+    }
+    else {
+        $('#elementName').text('');
+    }
+}
+</script>

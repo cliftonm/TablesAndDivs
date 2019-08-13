@@ -1,0 +1,567 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Fun with divs</title>
+</head>
+
+<body>
+
+<p>Fun Exploring DIV and TABLE layouts</p>
+<p>&nbsp;</p>
+<h2>Contents</h2><ul>
+<li><a href="#Introduction0">Introduction</a></li>
+<li><a href="#BasicLayout1">Basic Layout </a></li>
+<ul>
+<li><a href="#Floatvs.InlineBlock2">Float vs. Inline Block</a></li>
+<li><a href="#ReadingBetweentheLines3">Reading Between the Lines</a></li>
+<ul>
+<li><a href="#Lesson1-Youreditorismessingwithyourhead4">Lesson 1 - Your editor is messing with your head</a></li>
+<li><a href="#Lesson2-Yourminimizerwillmesswithyourheadtoo5">Lesson 2 - Your minimizer will mess with your head too</a></li>
+<li><a href="#Lesson3-Allthesolutionsarebad6">Lesson 3 - All the solutions are bad</a></li>
+</ul>
+</ul>
+<li><a href="#Left,Center,andRight,Atten-hup7">Left, Center, and Right, Atten-hup!</a></li>
+<ul>
+<li><a href="#Lesson3-floats,notinline-block8">Lesson 3 - floats, not inline-block</a></li>
+<li><a href="#Lesson4-AlwaysTestDifferentWidths9">Lesson 4 - Always Test Different Widths</a></li>
+<li><a href="#VerticalElementPositioning10">Vertical Element Positioning</a></li>
+<li><a href="#ClearingFloatandInlineBlock11">Clearing Float and Inline Block</a></li>
+<li><a href="#FixedWidthLeftandRightDivs12">Fixed Width Left and Right Divs</a></li>
+<li><a href="#DivScrolling13">Div Scrolling</a></li>
+</ul>
+<li><a href="#UsingTablesinsteadofDivs14">Using Tables instead of Divs</a></li>
+<ul>
+<li><a href="#Lesson5-HiddenSpacing15">Lesson 5 - Hidden Spacing</a></li>
+<li><a href="#FixedWidthColumns16">Fixed Width Columns</a></li>
+<li><a href="#ColumnScrolling17">Column Scrolling</a></li>
+</ul>
+<li><a href="#Conclusion18">Conclusion</a></li>
+</ul>
+
+<h2><a name="Introduction0">Introduction</a></h2>
+<p>This is a straightforward article demonstrating some very basic UI layout concepts 
+using either DIV or TABLE elements.&nbsp; The impetus for this is simply that I 
+often struggle with figuring out the nuances of how to position elements in the 
+UI so I get both the look and behavior that I want.&nbsp; By look, I mean the 
+positioning of sections of the UI and the elements within those sections, and by 
+behavior, I mean how the UI behaves when the browser window is resized.&nbsp; 
+I'm not covering things like device screen sizes or replacing a menu bar with a 
+&quot;triple bar&quot; dropdown -- there are component libraries like 
+<a href="https://getbootstrap.com/">Bootstrap</a> to handle that.&nbsp; </p>
+<p>All of these examples can be coded in Visual Code and viewed side-by-side 
+with
+<a href="https://marketplace.visualstudio.com/items?itemName=daiyy.quick-html-previewer">
+Quick HTML Previewer</a>, which of all the HTML preview plugins that I looked at 
+is the only one that I found actually works.</p>
+<h2><a name="BasicLayout1">Basic Layout </a></h2>
+<p>Let's start with something basic -- two inline divs.&nbsp; The HTML:</p>
+<pre>&lt;p&gt;Two inline divs:&lt;/p&gt;
+&lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter inline m10'&gt;Div 2&lt;/div&gt;</pre>
+<p>And the CSS I'm using to define the border, width, margin, and inline styles:</p>
+<pre>.border1 {
+  border-style:solid;
+  border-width: 1px;
+}
+
+.quarter {
+  width: 25%; 
+}
+
+.inline {
+  display: inline-block;
+}
+
+.m10 {
+  margin-left:10px;
+}</pre>
+<p>Yielding:</p>
+<p><img border="0" src="div4.png" width="297" height="40"></p>
+<h3><a name="Floatvs.InlineBlock2">Float vs. Inline Block</a></h3>
+<p>If you want some in depth reading about the two, I suggest
+<a href="https://www.ternstyle.us/blog/float-vs-inline-block">Ternstyle's blog 
+entry</a> and
+<a href="https://thoughtbot.com/blog/how-i-learned-to-stop-floating-and-love-the">
+Thoughtbot's blog entry</a>.&nbsp; For now, let's just deal with the practical 
+issues, otherwise known as WTF???</p>
+<p>Let's compare that with using a <code>float</code> style instead.&nbsp; The HTML:</p>
+<pre>&lt;p&gt;Inline divs using float:&lt;br&gt;
+Note a slight shift of Div2 to the left as compared to using inline.&lt;/p&gt;
+&lt;div class='border1 quarter fleft'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter fleft m10'&gt;Div 2&lt;/div&gt;</pre>
+<p>And the <code>fleft</code> CSS:</p>
+<pre>.fleft {
+  float:left;
+}
+</pre>
+<p><img border="0" src="div5.png" width="318" height="57"></p>
+<p>Looks pretty much the same, right?&nbsp; But notice there's a slight spacing 
+difference between the two divs:</p>
+<p><img border="0" src="div6.png" width="319" height="114"></p>
+<p>Why is that?&nbsp; Well, read on.</p>
+<h3><a name="ReadingBetweentheLines3">Reading Between the Lines</a></h3>
+<p>As it turns out, using <code>inline-block</code> respects 
+any text between the divs, whereas <code>float</code> moves the text between the divs out to 
+the right.&nbsp; This is an important behavioral difference!&nbsp; So the 
+difference between the divs using <code>inline-block</code> is because I have spaces in the 
+HTML:</p>
+<p><img border="0" src="div7.png" width="359" height="68"></p>
+<p>See the indentation of my nicely formatted HTML?&nbsp; Let's exaggerate this 
+difference between <code>inline-block</code> and <code>float</code>, getting rid 
+of my left margin and removing the editor's indentation:</p>
+<pre>&lt;p&gt;Two inline-block divs:&lt;/p&gt;
+James &lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;Tiberius
+&lt;div class='border1 quarter inline'&gt;Div 2&lt;/div&gt; Kirk
+
+&lt;p&gt;Two float divs:&lt;/p&gt;
+James &lt;div class='border1 quarter fleft'&gt;Div 1&lt;/div&gt;Tiberius
+&lt;div class='border1 quarter fleft'&gt;Div 2&lt;/div&gt; Kirk</pre>
+<p>And we get:</p>
+<p><img border="0" src="div8.png" width="398" height="94"></p>
+<p>Oh wow.&nbsp; Even the carriage return between the <code>inline-block</code> divs 
+is adding a space:</p>
+<pre>&lt;p&gt;Two inline-block divs:&lt;/p&gt;
+James &lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;Tiberius&lt;div class='border1 quarter inline'&gt;Div 2&lt;/div&gt; Kirk</pre>
+<p>Notice the space before the second div has now been removed:</p>
+<p><img border="0" src="div9.png" width="381" height="45"></p>
+<h4><a name="Lesson1-Youreditorismessingwithyourhead4">Lesson 1 - Your editor is messing with your head</a></h4>
+<p>You're lovely HTML indentation, and in particular, the <i>auto-indenting</i> 
+that your editor is doing for you, is affecting your layout using <code>inline-block</code>!</p>
+<h4><a name="Lesson2-Yourminimizerwillmesswithyourheadtoo5">Lesson 2 - Your minimizer will mess with your head too</a></h4>
+<p>So you've created the perfect layout in your editor and then you run a 
+minimizer which potentially removes the whitespace and carriage returns between 
+your divs.&nbsp; Suddenly you UI looks slightly different!</p>
+<h4><a name="Lesson3-Allthesolutionsarebad6">Lesson 3 - All the solutions are bad</a></h4>
+<p>All of the solutions are ugly.&nbsp; From
+<a href="https://stackoverflow.com/a/16679004/2276361">here</a> and
+<a href="https://css-tricks.com/fighting-the-space-between-inline-block-elements/">
+here</a>, they are:</p>
+<ul>
+	<li>Remove all whitespace and carriage returns between divs.&nbsp; So much 
+	for readable HTML.</li>
+	<li>Use float, but that has side-effects like we saw above with text between 
+	the divs.</li>
+	<li>Create a container div with <code>font-size</code> of 0 then override the font size 
+	in the child divs.&nbsp; Gross.</li>
+</ul>
+<p>Any my favorite driving-the-porcelain-bus solution:</p>
+<pre>James&lt;!--
+--&gt;&lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;Tiberius&lt;!--
+--&gt;&lt;div class='border1 quarter inline'&gt;Div 2&lt;/div&gt; Kirk</pre>
+<p>OK then.&nbsp; So there really is, at least in my opinion, no viable solution 
+that maintains a nicely formatted HTML document and renders the same identical 
+layout when the HTML is minimized.&nbsp; Which basically means, always test your 
+layout as minimized HTML rather than in a preview editor.&nbsp; And of course 
+there's no preview editor that I know of that will minimize your HTML before 
+feeding it to the browser.&nbsp; Hmmm, there's another article idea!&nbsp; Of 
+course, if you have a really smart minimizer that respects whitespace and 
+carriage returns between and around <code>inline-block</code> divs, that would help too.&nbsp; 
+Anyone with better suggestions?</p>
+<h2><a name="Left,Center,andRight,Atten-hup7">Left, Center, and Right, Atten-hup!</a></h2>
+<p>Most of the time I need layout options that include being able to position an 
+entire section to the left, center, and/or right of the page as well as position 
+the elements within those sections on the left, center, right and top, middle, 
+or bottom.&nbsp; That's not too much to ask for, is it?&nbsp; Riiiight.</p>
+<p>Here's the HTML for a simple layout (note I'm using <code>float</code>):</p>
+<pre>&lt;p&gt;Left, centered, and right floating divs:&lt;br&gt;
+Note the centered div must come last so the left and right&lt;br&gt;
+margins can be computed. Furthermore, we can't use &quot;inline-block&quot;,&lt;br&gt;
+we have to use &quot;float.&quot;&lt;/p&gt;
+&lt;div class='border1 fleft quarter'&gt;Left&lt;/div&gt;
+&lt;div class='border1 fright quarter taright'&gt;Right&lt;/div&gt;
+&lt;div class='border1 center tacenter'&gt;Center&lt;/div&gt;</pre>
+<p>and the additional CSS:</p>
+<pre>.center {
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.quarter {
+  width: 25%; 
+}
+
+.fleft {
+  float:left;
+  padding: 0;
+  margin: 0;
+}
+
+.fright {
+  float:right;
+}
+
+.tacenter {
+  text-align: center;
+}
+
+.taright {
+  text-align: right;
+}</pre>
+<p>And the result:</p>
+<p><img border="0" src="div10.png" width="536" height="97"></p>
+<h3><a name="Lesson3-floats,notinline-block8">Lesson 3 - floats, not inline-block</a></h3>
+<ul>
+	<li>We have to use <code>float</code>!</li>
+	<li>The center div has to come last!</li>
+</ul>
+<p>If we try to use <code>inline-block</code> with float, the center auto-margin 
+is ignored.&nbsp; Using this HTML:</p>
+<pre>&lt;div class='border1 inline fleft quarter'&gt;Left&lt;/div&gt;
+&lt;div class='border1 inline center quarter tacenter'&gt;Center&lt;/div&gt;
+&lt;div class='border1 inline fright quarter taright'&gt;Right&lt;/div&gt;</pre>
+<p>we get:</p>
+<p><img border="0" src="div11.png" width="538" height="45"></p>
+<p>The problem here is that the we're specifying the width of the center region.&nbsp; 
+This means that the center doesn't dynamically expand the way the center float 
+version does when the browser width shrinks.</p>
+<p>Using float:</p>
+<p><img border="0" src="div12.png" width="238" height="26"></p>
+<p>Using inline-block:</p>
+<p><img border="0" src="div13.png" width="219" height="26"></p>
+<p>Instead, the center div width, using inline-block, is determined by the 
+content of the div.&nbsp; This makes it impossible to right-justify text against 
+the left edge of the rightmost div.&nbsp; Got that?&nbsp; If there is a 
+solution, I haven't found it.&nbsp; Anyone?</p>
+<h3><a name="Lesson4-AlwaysTestDifferentWidths9">Lesson 4 - Always Test Different Widths</a></h3>
+<p>We can get some bizarre effects.&nbsp; Given this HTML:</p>
+<pre>&lt;p&gt;Playing with wrapper and inner widths:&lt;/p&gt;
+&lt;div class='border1 fleft quarter'&gt;Left&lt;/div&gt;
+&lt;div class='border1 fright right quarter taright'&gt;Right&lt;/div&gt;
+&lt;div class='border1 center tacenter w40p'&gt;
+  &lt;div class='border1 fleft taleft w40p'&gt;Left: Some long text that forces a line wrap.&lt;/div&gt;
+  &lt;div class='border1 fright right taright w40p'&gt;Right: Some long text that forces a line wrap.&lt;/div&gt;
+  &lt;div class='border1 center tacenter'&gt;Center: Some long text that forces a line wrap.&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>We can resize the width of the browser window and we see:</p>
+<p><img border="0" src="div14.png" width="657" height="125"></p>
+<p>But wait!&nbsp; A little different width and we get:</p>
+<p><img border="0" src="div15.png" width="611" height="128"></p>
+<p>This effect is the result of the inner right div's height forcing the 
+inner-center text at the bottom to not be able to extend the full width of the 
+center div.&nbsp; Makes sense, right?&nbsp; The point being, always test your 
+layout with different browser widths.&nbsp; Within reason, of course!</p>
+<h3><a name="VerticalElementPositioning10">Vertical Element Positioning</a></h3>
+<p>I discovered <a href="https://vanseodesign.com/css/vertical-centering/">
+vanseo design's blog post</a> that solved this problem for me, so what you see 
+here is just a regurgitation of their post.&nbsp; To achieve this:</p>
+<p><img border="0" src="div16.png" width="557" height="139"></p>
+<p>Requires treating the divs as table cells!&nbsp; Here's the HTML:</p>
+<pre>&lt;p&gt;Child element poisitioning:&lt;/p&gt;
+  &lt;div class='parent border1 fleft w33p h100px'&gt;
+  &lt;div class=&quot;child-top-left&quot;&gt;&lt;button&gt;Button A&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;div class='parent border1 fleft w33p h100px'&gt;
+  &lt;div class=&quot;child-middle-center&quot;&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;div class='parent border1 fleft w33p h100px'&gt;
+  &lt;div class=&quot;child-bottom-right&quot;&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>and here's the additional CSS:</p>
+<pre>.w33p {
+  width: 33%;
+}
+
+.h100px {
+  height: 100px;
+}
+
+.parent {display: table;}
+
+.child-top-left {
+  display: table-cell;
+}
+
+.child-middle-center {
+  display: table-cell;
+  vertical-align: middle;
+  text-align: center;
+}
+
+.child-bottom-right {
+  display: table-cell;
+  vertical-align: bottom;
+  text-align: right;
+}</pre>
+<p>Funny how we use the <code>text-align</code> style to align inner HTML elements!&nbsp; 
+So this works because we're creating divs that simulate table cells, which is a 
+natural lead in to the next section, doing the same thing with tables.&nbsp; But 
+first...</p>
+<h3><a name="ClearingFloatandInlineBlock11">Clearing Float and Inline Block</a></h3>
+<p>Consider this fragment:</p>
+<pre>&lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter inline m10'&gt;Div 2&lt;/div&gt;
+
+&lt;div class='border1 quarter fleft'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter fleft m10'&gt;Div 2&lt;/div&gt;</pre>
+<p>Resulting in:</p>
+<p><img border="0" src="div21.png" width="453" height="53"></p>
+<p>That isn't what we want at all!&nbsp; To deal with this, we need to clear the 
+float elements on the left and right:.</p>
+<p>HTML:</p>
+<pre>&lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter inline m10'&gt;Div 2&lt;/div&gt;
+
+&lt;div class='clear'&gt;&lt;/div&gt;
+
+&lt;div class='border1 quarter fleft'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter fleft m10'&gt;Div 2&lt;/div&gt;</pre>
+<p>CSS:</p>
+<pre>.clear {
+  clear:both; 
+}</pre>
+<p>Resulting in a &quot;new line&quot;:</p>
+<p><img border="0" src="div22.png" width="310" height="48"></p>
+<p>While a paragraph creates the same effect, it adds undesirable vertical 
+separation between the two divs.</p>
+<p>HTML:</p>
+<pre>&lt;div class='border1 quarter inline'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter inline m10'&gt;Div 2&lt;/div&gt;
+
+&lt;p&gt;&lt;/p&gt;
+
+&lt;div class='border1 quarter fleft'&gt;Div 1&lt;/div&gt;
+&lt;div class='border1 quarter fleft m10'&gt;Div 2&lt;/div&gt;</pre>
+<p>Result:</p>
+<p><img border="0" src="div23.png" width="307" height="59"></p>
+<h3><a name="FixedWidthLeftandRightDivs12">Fixed Width Left and Right Divs</a></h3>
+<p>Let's say you want 3 divs where the left and right are of fixed (in pixels) 
+width and the center div resizes based on the browser width.&nbsp; The only 
+solution I found (after perusing SO) is to use the calc style:</p>
+<pre>&lt;p&gt;Left and Right divs of fixed width:&lt;/p&gt;
+
+&lt;div class='parent border1 fleft w100px h100px'&gt;
+  &lt;div class=&quot;child-top-left&quot;&gt;&lt;button&gt;Button A&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class='parent border1 fleft h100px' style='width: calc(100% - 206px);'&gt;
+  &lt;div class=&quot;child-middle-center&quot;&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class='parent border1 fleft w100px h100px'&gt;
+  &lt;div class=&quot;child-bottom-right&quot;&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>Since this calculation is so dependent on the number of divs in the &quot;row&quot;, I 
+decided to put this in as an actual <code>style</code> rather than as CSS.&nbsp; 
+The number 206 comes from the left and right divs being 100 pixels each, plus 1 
+pixel for the borders for each div: 100 + 100 + 1 + 1 + 1 + 1 + 1 + 1 = 206.</p>
+<p>The result works nicely regardless of browser window width:</p>
+<p><img border="0" src="div24.png" width="557" height="136"></p>
+<p>Not ideal with this magic number, and compare this to the solution using 
+tables.</p>
+<p>According to the
+<a href="https://developer.mozilla.org/en-US/docs/Web/CSS/calc">Mozilla docs</a>: 
+&quot;The calc() CSS function lets you perform calculations when specifying CSS 
+property values. It can be used anywhere a &lt;length&gt;, &lt;frequency&gt;, &lt;angle&gt;, 
+&lt;time&gt;, &lt;percentage&gt;, &lt;number&gt;, or &lt;integer&gt; is allowed.&quot;</p>
+<h3><a name="DivScrolling13">Div Scrolling</a></h3>
+<p>A lot of times you'll see a div that has a scrollbar when the content exceeds 
+the height.&nbsp; Let's see how that's done using the overflow-y and height 
+styles.</p>
+<p>HTML:</p>
+<pre>&lt;p&gt;Left div scrolling:&lt;/p&gt;
+&lt;div class='parent border1 fleft w100px h100px'&gt;
+  &lt;div class=&quot;child-top-left&quot;&gt;
+    &lt;div class='scrolly h100p'&gt;
+      &lt;p&gt;Menu Item 1&lt;/p&gt;
+      &lt;p&gt;Menu Item 2&lt;/p&gt;
+      &lt;p&gt;Menu Item 3&lt;/p&gt;
+      &lt;p&gt;Menu Item 4&lt;/p&gt;
+      &lt;p&gt;Menu Item 5&lt;/p&gt;
+      &lt;p&gt;Menu Item 6&lt;/p&gt;
+    &lt;/div&gt;
+  &lt;/div&gt;
+&lt;/div&gt;
+  &lt;div class='parent border1 fleft h100px' style='width: calc(100% - 206px);'&gt;
+  &lt;div class=&quot;child-middle-center&quot;&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;
+  &lt;div class='parent border1 fleft w100px h100px'&gt;
+  &lt;div class=&quot;child-bottom-right&quot;&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/div&gt;
+&lt;/div&gt;</pre>
+<p>Additional CSS:</p>
+<pre>.h100p {
+  height: 100%;
+}
+
+.scrolly {
+  overflow-y: auto;
+}</pre>
+<p>Note that we have to use an inner div for the child div.&nbsp; The result is:</p>
+<p><img border="0" src="div25.png" width="553" height="130"></p>
+<p>The scrollbar goes away if the height of the child's inner div is less than 
+the child div.&nbsp; What we lose though is the ability to vertically align the 
+inner elements; they can still be horizontally aligned.&nbsp; This makes a kind 
+of sense, as why would you have a scrollbar with content that is vertically 
+centered or at the bottom?</p>
+<h2><a name="UsingTablesinsteadofDivs14">Using Tables instead of Divs</a></h2>
+<p>Let's cut right to the chase and reproduce the previous layout using actual 
+tables, rows, and columns.&nbsp; Here's the HTML:</p>
+
+<pre>&lt;p&gt;Tables instead of Divs&lt;/p&gt;
+&lt;table class='w100p'&gt;
+  &lt;tr&gt;
+    &lt;th&gt;A&lt;/th&gt;
+    &lt;th&gt;B&lt;/th&gt;
+    &lt;th&gt;C&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr class='h100px'&gt;
+    &lt;td class='border1 w33p vatop'&gt;&lt;button&gt;Button A&lt;/button&gt;&lt;/td&gt;
+    &lt;td class='border1 w33p tacenter vacenter'&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/td&gt;
+    &lt;td class='border1 w33p taright vabottom'&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt; </pre>
+<p>And the CSS:</p>
+<pre>.w100p {
+  width: 100%;
+}
+
+.taleft {
+  text-align: left;
+}
+
+.tacenter {
+  text-align: center;
+}
+
+.taright {
+  text-align: right;
+}
+
+.vatop {
+  vertical-align: top;
+}
+
+.vamiddle {
+  vertical-align: middle;
+}
+
+.vabottom {
+  vertical-align: bottom;
+}</pre>
+<p>Resulting in:</p>
+<p><img border="0" src="div17.png" width="552" height="157"></p>
+<p>Notice the space between the columns?&nbsp; To get rid of that, we have to 
+use the <code>border-collapse</code> style:</p>
+<p>HTML:</p>
+<pre>&lt;table class='w100p noborders'&gt;</pre>
+<p>CSS:</p>
+
+<pre>.noborders {
+  border-collapse: collapse; 
+}
+</pre>
+<p>Resulting in:</p>
+<p><img border="0" src="div18.png" width="553" height="158"></p>
+<h3><a name="Lesson5-HiddenSpacing15">Lesson 5 - Hidden Spacing</a></h3>
+<p>As with divs, table columns have hidden spacing you may not be aware of.&nbsp; 
+I'm beginning to realize that it's a good idea to start a UI layout design with 
+borders around <i>everything</i> so you can see exactly what's going on in the 
+layout!&nbsp; This is easily accomplished by specifying the CSS style for your 
+elements, for example:</p>
+<pre>table {
+  border-style:solid;
+  border-width: 1px;
+}
+
+th {
+  border-style:solid;
+  border-width: 1px;
+}
+
+tr {
+  border-style:solid;
+  border-width: 1px;
+}
+
+td {
+  border-style:solid;
+  border-width: 1px;
+}</pre>
+<p><img border="0" src="div19.png" width="587" height="130"></p>
+<p>You can then delete this CSS when you're happy with the layout.</p>
+<h3><a name="FixedWidthColumns16">Fixed Width Columns</a></h3>
+<p>Here, the <code>auto</code> style and the <code>col</code> elements come into 
+play.&nbsp; The following example illustrates the left and right columns having 
+fixed widths and the center column being sized to fit between the two.</p>
+<p>HTML (note I'm using the element CSS described above to set the border for 
+the table, tr, th, and td elements):</p>
+<pre>&lt;p&gt;Three column with left and right in fixed pixels&lt;/p&gt;
+&lt;table class='w100p noborders' style='table-layout:fixed'&gt;
+  &lt;col class='w100px'/&gt;
+  &lt;col class='wauto'/&gt;
+  &lt;col class='w100px'/&gt;
+  &lt;tr&gt;
+    &lt;th&gt;A&lt;/th&gt;
+    &lt;th&gt;B&lt;/th&gt;
+    &lt;th&gt;C&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr class='h100px'&gt;
+    &lt;td class='vatop'&gt;&lt;button&gt;Button A&lt;/button&gt;&lt;/td&gt;
+    &lt;td class='tacenter vacenter'&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/td&gt;
+    &lt;td class='taright vabottom'&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt; </pre>
+<p>Additional CSS:</p>
+<pre>.w100px {
+  width: 100px;
+}
+
+.wauto {
+  width: auto;
+}</pre>
+<p>This resulting in the center column resizing as the browser width is increased / 
+decreased while the left and right columns remain fixed width.</p>
+<p><img border="0" src="div20.png" width="596" height="165"></p>
+<h3><a name="ColumnScrolling17">Column Scrolling</a></h3>
+<p>As with divs, let's see if we can get scrolling to work in a column.&nbsp; 
+The solution is quite simple -- put a <code>div</code> inside the <code>td</code>!&nbsp; 
+Contrast this with the approach described in the section on divs, particularly 
+note that the height when using divs was specified as 100% while here, it's 
+specified as the column height, 100 <i>pixels </i>matching the outer tr height.</p>
+<p>HTML:</p>
+<pre>&lt;p&gt;Column Scrolling&lt;/p&gt;
+&lt;table class='w100p noborders' style='table-layout:fixed'&gt;
+  &lt;col class='w100px'/&gt;
+  &lt;col class='wauto'/&gt;
+  &lt;col class='w100px'/&gt;
+  &lt;tr&gt;
+    &lt;th&gt;A&lt;/th&gt;
+    &lt;th&gt;B&lt;/th&gt;
+    &lt;th&gt;C&lt;/th&gt;
+  &lt;/tr&gt;
+  &lt;tr class='h100px'&gt;
+    &lt;td class='vatop'&gt;
+      &lt;div class='scrolly h100px'&gt;
+        &lt;p&gt;Menu Item 1&lt;/p&gt;
+        &lt;p&gt;Menu Item 2&lt;/p&gt;
+        &lt;p&gt;Menu Item 3&lt;/p&gt;
+        &lt;p&gt;Menu Item 4&lt;/p&gt;
+        &lt;p&gt;Menu Item 5&lt;/p&gt;
+        &lt;p&gt;Menu Item 6&lt;/p&gt;
+      &lt;/div&gt;
+    &lt;/td&gt;
+    &lt;td class='tacenter vacenter'&gt;&lt;button&gt;Button B&lt;/button&gt;&lt;/td&gt;
+    &lt;td class='taright vabottom'&gt;&lt;button&gt;Button C&lt;/button&gt;&lt;/td&gt;
+  &lt;/tr&gt;
+&lt;/table&gt; </pre>
+<p>Additional CSS:</p>
+<pre>.scrolly {
+  overflow-y: auto;
+}
+</pre>
+<p>And we get:</p>
+<p><img border="0" src="div26.png" width="552" height="149"></p>
+<h2><a name="Conclusion18">Conclusion</a></h2>
+<p>So that's as far I want to take this today.&nbsp; What I've shown here is 
+that you can use divs and tables for layout control equally well, though given 
+that some of div layout requires having the div behave like a table and table 
+cell tends to suggest that using tables is better than divs.&nbsp; Also, some of 
+wonky things like using the <code>calc()</code> function are not necessary with tables.&nbsp; I hope you at least had fun 
+reading this and perhaps learned a thing or two.&nbsp; And if there's a better 
+way of doing things, please leave a comment!</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
