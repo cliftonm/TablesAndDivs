@@ -6,6 +6,7 @@
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
     :root {
         --propertyWidth: 200px;
+        --toolbarHeight: 30px;
     }
 
     .noborders {
@@ -88,7 +89,18 @@
         width: var(--propertyWidth);
     }
 
-    .taeditor {
+    .taeditorh {
+        height: calc(100% - var(--toolbarHeight));
+        width: 100%;
+        resize: none;
+        padding: 0;
+        margin: 0;
+        white-space:normal;   /* or auto? */
+        overflow: auto;
+    }
+
+
+    .taeditorv {
         height: 100%;
         width: 100%;
         resize: none;
@@ -124,18 +136,61 @@
         height:100%;
     }
 
+    .vamiddle {
+        vertical-align: middle;
+    }
+
+    .toolbar {
+        height: var(--toolbarHeight);
+        width: 100%;
+        padding-left: 5px;
+    }
+
+    .parent {display: table;}
+
+    .child-top-left {
+        display: table-cell;
+    }
+
+    .child-middle-left {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .child-middle-center {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .child-bottom-right {
+        display: table-cell;
+        vertical-align: bottom;
+        text-align: right;
+    }
+
+    .hidden {
+        display: none;
+    }
+
 </style>
 
 <body>
     <!-- 3 Horizontal panels -->
 
-<!--
-    <div class='fullscreen'>    
+    <div class='fullscreen hidden' id='horizontalView'>    
+        <div class='parent toolbar'>
+            <div class="child-middle-left">
+                <button class='showHorizontal'>Horizontal</button>
+                <button class='showVertical'>Vertical</button>
+            </div>
+        </div>
         <table class='noborders fixed fill'>
             <tr>
                 <td class='editorhw'>
                     <div class='h100p'>
-                        <textarea id='editor' class='taeditor'></textarea>
+                        <textarea class='taeditorh' id='editor'></textarea>
                     </div>
                 </td>
                 <td class='mw1px'>
@@ -149,19 +204,26 @@
             </tr>
         </table>
     </div>
--->
 
     <!-- top and bottom editor and preview with properties sidebar -->
 
-    <div class='fullscreen' id='outerWindow'>
+    <div class='fullscreen' id='verticalView'>
         <table class='noborders fill'>
+            <tr style='height:1px;'>
+                <div class='parent toolbar'>
+                    <div class="child-middle-left">
+                        <button class='showHorizontal'>Horizontal</button>
+                        <button class='showVertical'>Vertical</button>
+                    </div>
+                </div>
+            </tr>
             <tr>
                 <td>
                     <table class='noborders fill'>
                         <tr>
                             <td>
                                 <div class='h100p'>
-                                    <textarea class='taeditor' id='editor'></textarea>
+                                    <textarea class='taeditorv editorel' id='editor'></textarea>
                                 </div>
                             </td>
                         </tr>
@@ -189,6 +251,8 @@ $(document).ready(() => initialize());
 function wireUpEvents() {
     $('#editor').keyup(event => editorKeyPress(event.which));
     $('#preview').mouseover(event => previewMouseOver(event.target));
+    $('.showHorizontal').click(() => showHorizontalLayout());
+    $('.showVertical').click(() => showVerticalLayout());
 }
 
 function initialize() {
@@ -209,6 +273,16 @@ function previewMouseOver(element) {
     else {
         $('#elementName').text('');
     }
+}
+
+function showVerticalLayout() {
+    $('#verticalView').removeClass('hidden');
+    $('#horizontalView').addClass('hidden');
+}
+
+function showHorizontalLayout() {
+    $('#verticalView').addClass('hidden');
+    $('#horizontalView').removeClass('hidden');
 }
 
 </script>
