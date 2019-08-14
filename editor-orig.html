@@ -1,0 +1,340 @@
+<!--
+    Styles defined here carry into the preview because it's embedded HTML.
+    So any styles names common to the editor's HTML will pick up the styles used in the editor!
+    Javascript does not run because the document is already "ready".
+-->
+
+<head>
+    <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
+</head>
+
+<style>
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
+    :root {
+        --propertyWidth: 200px;
+        --toolbarHeight: 30px;
+    }
+
+    .noborders {
+        border-collapse: collapse;    
+    }
+
+    .border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    div {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    table {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    th {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    tr {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    td {
+        border-style:solid;
+        border-width: 1px;
+    }
+
+    body {
+        padding:0; 
+        margin:0;
+    }
+
+/* Absolution positioning should be avoided like the plague! */
+/*
+    .fullscreen {
+        height: 100%;
+        width: 100%; 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        left: 0; 
+        right: 0;
+        table-layout: fixed;
+    }
+*/
+
+    .fullscreen {
+        width:calc(100% - 2px); 
+        height:calc(100vh - 2px);
+        padding: 0;
+        margin: 0;
+    }
+
+/*
+    .fullscreenv {
+        height: 100%;
+        width: calc(100% - (var(--propertyWidth) + 2px)); 
+        position: absolute; 
+        top: 0; 
+        bottom: 0; 
+        left: 0; 
+        right: 0;
+    }
+*/
+
+    .editorhw {
+        width: calc(100% - var(--propertyWidth));
+    }
+
+    .properties {
+        width: var(--propertyWidth);
+    }
+
+    .taeditorh {
+        height: calc(100% - var(--toolbarHeight));
+        width: 100%;
+        resize: none;
+        padding: 0;
+        margin: 0;
+        white-space:normal;   /* or auto? */
+        overflow: auto;
+    }
+
+    .taeditorv {
+        height: 100%;
+        width: 100%;
+        resize: none;
+        padding: 0;
+        margin: 0;
+        white-space:normal;   /* or auto? */
+        overflow: auto;
+    }
+
+    .h100p {
+        height: 100%;
+    }
+
+    .text-bold {
+        font-weight: bold;
+    }
+
+    .mw1px {
+        max-width: 1px;
+    }
+
+    .preview {
+        overflow: auto;
+        white-space: normal;
+    }
+
+    .fixed {
+        table-layout: fixed;
+    }
+
+    .fill {
+        width:100%; 
+        height:100%;
+    }
+
+    .vamiddle {
+        vertical-align: middle;
+    }
+
+    .toolbar {
+        height: var(--toolbarHeight);
+        width: 100%;
+        padding-left: 5px;
+    }
+
+    .parent {display: table;}
+
+    .child-top-left {
+        display: table-cell;
+    }
+
+    .child-middle-left {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: left;
+    }
+
+    .child-middle-center {
+        display: table-cell;
+        vertical-align: middle;
+        text-align: center;
+    }
+
+    .child-bottom-right {
+        display: table-cell;
+        vertical-align: bottom;
+        text-align: right;
+    }
+
+    .hidden {
+        display: none;
+    }
+
+</style>
+
+<body>
+    <!-- 3 Horizontal panels -->
+
+    <div class='fullscreen hidden' id='horizontalView'>    
+        <div class='parent toolbar'>
+            <div class="child-middle-left buttonBar"></div>
+        </div>
+        <table class='noborders fixed fill'>
+            <tr>
+                <td class='editorhw'>
+                    <div class='h100p'>
+                        <textarea class='taeditorh' id='editorh'></textarea>
+                    </div>
+                </td>
+                <td class='mw1px'>
+                    <div class='preview h100p' id='previewh'></div>
+                </td>
+                <td class='properties'>
+                    <div class='h100p propertiesContainer'></div>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- top and bottom editor and preview with properties sidebar -->
+
+    <div class='fullscreen' id='verticalView'>
+        <table class='noborders fill'>
+            <tr style='height:1px;'>
+                <div class='parent toolbar'>
+                    <div class="child-middle-left buttonBar"></div>
+                </div>
+            </tr>
+            <tr>
+                <td>
+                    <table class='noborders fill'>
+                        <tr>
+                            <td>
+                                <div class='h100p'>
+                                    <textarea class='taeditorv editorel' id='editorv'></textarea>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class='mw1px'>
+                                <div class='preview h100p' id='previewv'></div>
+                            </td>
+                        </tr>
+                    </table>
+                </td>
+                <td class='properties'>
+                    <div class='h100p propertiesContainer'></div>
+                </td>
+            </tr>
+        </table>
+    </div>    
+
+    <div class='hidden' id='sourceButtonBar'>
+        <button class='showHorizontal'>Horizontal</button>
+        <button class='showVertical'>Vertical</button>
+        <button class='clearEditors'>Clear</button>
+    </div>
+
+    <div class='hidden' id = 'sourcePropertiesContainer'>
+        Element: <span class='text-bold elementName'></span>
+    </div>
+
+</body>
+
+<script>
+$(document).ready(() => initialize());
+
+function wireUpEvents() {
+    $('#editorh').keyup(event => editorKeyPress(event.which, '#editorh', '#previewh'));
+    $('#editorv').keyup(event => editorKeyPress(event.which, '#editorv', '#previewv'));
+    $('.preview').mouseover(event => previewMouseOver(event.target));
+    $('.preview').mouseleave(event => clearProperties());
+    $('.showHorizontal').click(() => showHorizontalLayout());
+    $('.showVertical').click(() => showVerticalLayout());
+    $('.clearEditors').click(() => clearEditors());
+}
+
+function initialize() {
+    // Before wiring up events, setup the common containers.
+    setupButtonBar();
+    setupPropertiesContainer();
+    wireUpEvents();
+    demo();
+}
+
+function setupButtonBar() {
+    let html = $('#sourceButtonBar').html();
+    $('.buttonBar').html(html);
+}
+
+function setupPropertiesContainer() {
+    let html = $('#sourcePropertiesContainer').html();
+    $('.propertiesContainer').html(html);
+}
+
+function editorKeyPress(key, sourceEditor, targetPreview) {
+    let editorText = $(sourceEditor).val();
+    $(targetPreview).html(editorText);
+}
+
+function previewMouseOver(element) {
+    // Ignore the preview box itself.
+    if (!element.classList.contains('preview')) {
+        let tagName = element.tagName;
+        console.log(tagName);
+        $('.elementName').text(tagName);
+    }
+    else {
+        $('.elementName').text('');
+    }
+}
+
+function clearProperties() {
+    $('.elementName').text('');
+}
+
+function showVerticalLayout() {
+    copy('h', 'v');
+    $('#verticalView').removeClass('hidden');
+    $('#horizontalView').addClass('hidden');
+}
+
+function showHorizontalLayout() {
+    copy('v', 'h');
+    $('#verticalView').addClass('hidden');
+    $('#horizontalView').removeClass('hidden');
+}
+
+function clearEditors() {
+    $('#editorh').val('');
+    $('#editorv').val('');
+    $('#previewh').html('');
+    $('#previewv').html('');
+}
+
+function demo() {
+    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p>Hello World!</p>";
+    $('#editorv').val(demoText);
+    $('#previewv').html(demoText);
+}
+
+// Copy from one editor to the other
+function copy(esource, etarget) {
+    let edSource = '#editor' + esource;
+    let edTarget = '#editor' + etarget;
+    let pTarget = '#preview' + etarget;
+    let editorText = $(edSource).val();
+    $(edTarget).val(editorText);
+    $(pTarget).html(editorText);
+}
+
+</script>

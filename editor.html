@@ -1,7 +1,12 @@
 <!--
-    Styles defined here carry into the preview because it's embedded HTML.
+    Styles defined here carry into the __preview because it's embedded HTML.
     So any styles names common to the editor's HTML will pick up the styles used in the editor!
     Javascript does not run because the document is already "ready".
+
+let el = document.getElementById('div');
+
+$(el).css('width')
+$(el).css('width', '50%')
 -->
 
 <head>
@@ -9,19 +14,10 @@
 </head>
 
 <style>
-    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom_properties */
+    /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom___properties */
     :root {
-        --propertyWidth: 200px;
-        --toolbarHeight: 30px;
-    }
-
-    .noborders {
-        border-collapse: collapse;    
-    }
-
-    .border1 {
-        border-style:solid;
-        border-width: 1px;
+        --__propertyWidth: 200px;
+        --__toolbarHeight: 30px;
     }
 
     div {
@@ -54,9 +50,18 @@
         margin:0;
     }
 
+    .__noborders {
+        border-collapse: collapse;    
+    }
+
+    .__border1 {
+        border-style:solid;
+        border-width: 1px;
+    }
+
 /* Absolution positioning should be avoided like the plague! */
 /*
-    .fullscreen {
+    .__fullscreen {
         height: 100%;
         width: 100%; 
         position: absolute; 
@@ -68,7 +73,7 @@
     }
 */
 
-    .fullscreen {
+    .__fullscreen {
         width:calc(100% - 2px); 
         height:calc(100vh - 2px);
         padding: 0;
@@ -76,9 +81,9 @@
     }
 
 /*
-    .fullscreenv {
+    .__fullscreenv {
         height: 100%;
-        width: calc(100% - (var(--propertyWidth) + 2px)); 
+        width: calc(100% - (var(--__propertyWidth) + 2px)); 
         position: absolute; 
         top: 0; 
         bottom: 0; 
@@ -87,16 +92,16 @@
     }
 */
 
-    .editorhw {
-        width: calc(100% - var(--propertyWidth));
+    .__editorhw {
+        width: calc(100% - var(--__propertyWidth));
     }
 
-    .properties {
-        width: var(--propertyWidth);
+    .__properties {
+        width: var(--__propertyWidth);
     }
 
-    .taeditorh {
-        height: calc(100% - var(--toolbarHeight));
+    .__taeditorh {
+        height: calc(100% - var(--__toolbarHeight));
         width: 100%;
         resize: none;
         padding: 0;
@@ -105,7 +110,7 @@
         overflow: auto;
     }
 
-    .taeditorv {
+    .__taeditorv {
         height: 100%;
         width: 100%;
         resize: none;
@@ -115,67 +120,67 @@
         overflow: auto;
     }
 
-    .h100p {
+    .__h100p {
         height: 100%;
     }
 
-    .text-bold {
+    .__text-bold {
         font-weight: bold;
     }
 
-    .mw1px {
+    .__mw1px {
         max-width: 1px;
     }
 
-    .preview {
+    .__preview {
         overflow: auto;
         white-space: normal;
     }
 
-    .fixed {
+    .__fixed {
         table-layout: fixed;
     }
 
-    .fill {
+    .__fill {
         width:100%; 
         height:100%;
     }
 
-    .vamiddle {
+    .__vamiddle {
         vertical-align: middle;
     }
 
-    .toolbar {
-        height: var(--toolbarHeight);
+    .__toolbar {
+        height: var(--__toolbarHeight);
         width: 100%;
         padding-left: 5px;
     }
 
-    .parent {display: table;}
+    .__parent {display: table;}
 
-    .child-top-left {
+    .__child-top-left {
         display: table-cell;
     }
 
-    .child-middle-left {
+    .__child-middle-left {
         display: table-cell;
         vertical-align: middle;
         text-align: left;
     }
 
-    .child-middle-center {
+    .__child-middle-center {
         display: table-cell;
         vertical-align: middle;
         text-align: center;
     }
 
-    .child-bottom-right {
+    .__child-bottom-right {
         display: table-cell;
         vertical-align: bottom;
         text-align: right;
     }
 
-    .hidden {
+    .__hidden {
         display: none;
     }
 
@@ -184,68 +189,68 @@
 <body>
     <!-- 3 Horizontal panels -->
 
-    <div class='fullscreen hidden' id='horizontalView'>    
-        <div class='parent toolbar'>
-            <div class="child-middle-left buttonBar"></div>
+    <div class='__fullscreen __hidden' id='__horizontalView'>    
+        <div class='__parent __toolbar'>
+            <div class="__child-middle-left __buttonBar"></div>
         </div>
-        <table class='noborders fixed fill'>
+        <table class='__noborders __fixed __fill'>
             <tr>
-                <td class='editorhw'>
-                    <div class='h100p'>
-                        <textarea class='taeditorh' id='editorh'></textarea>
+                <td class='__editorhw'>
+                    <div class='__h100p'>
+                        <textarea class='__taeditorh' id='__editorh'></textarea>
                     </div>
                 </td>
-                <td class='mw1px'>
-                    <div class='preview h100p' id='previewh'></div>
+                <td class='__mw1px'>
+                    <div class='__preview __h100p' id='__previewh'></div>
                 </td>
-                <td class='properties'>
-                    <div class='h100p propertiesContainer'></div>
+                <td class='__properties'>
+                    <div class='__h100p __propertiesContainer'></div>
                 </td>
             </tr>
         </table>
     </div>
 
-    <!-- top and bottom editor and preview with properties sidebar -->
+    <!-- top and bottom editor and __preview with __properties sidebar -->
 
-    <div class='fullscreen' id='verticalView'>
-        <table class='noborders fill'>
+    <div class='__fullscreen' id='__verticalView'>
+        <table class='__noborders __fill'>
             <tr style='height:1px;'>
-                <div class='parent toolbar'>
-                    <div class="child-middle-left buttonBar"></div>
+                <div class='__parent __toolbar'>
+                    <div class="__child-middle-left __buttonBar"></div>
                 </div>
             </tr>
             <tr>
                 <td>
-                    <table class='noborders fill'>
+                    <table class='__noborders __fill'>
                         <tr>
                             <td>
-                                <div class='h100p'>
-                                    <textarea class='taeditorv editorel' id='editorv'></textarea>
+                                <div class='__h100p'>
+                                    <textarea class='__taeditorv' id='__editorv'></textarea>
                                 </div>
                             </td>
                         </tr>
                         <tr>
-                            <td class='mw1px'>
-                                <div class='preview h100p' id='previewv'></div>
+                            <td class='__mw1px'>
+                                <div class='__preview __h100p' id='__previewv'></div>
                             </td>
                         </tr>
                     </table>
                 </td>
-                <td class='properties'>
-                    <div class='h100p propertiesContainer'></div>
+                <td class='__properties'>
+                    <div class='__h100p __propertiesContainer'></div>
                 </td>
             </tr>
         </table>
     </div>    
 
-    <div class='hidden' id='sourceButtonBar'>
+    <div class='__hidden' id='__sourceButtonBar'>
         <button class='showHorizontal'>Horizontal</button>
         <button class='showVertical'>Vertical</button>
         <button class='clearEditors'>Clear</button>
     </div>
 
-    <div class='hidden' id = 'sourcePropertiesContainer'>
-        Element: <span class='text-bold elementName'></span>
+    <div class='__hidden' id = '__sourcePropertiesContainer'>
+        Element: <span class='__text-bold __elementName'></span>
     </div>
 
 </body>
@@ -254,84 +259,87 @@
 $(document).ready(() => initialize());
 
 function wireUpEvents() {
-    $('#editorh').keyup(event => editorKeyPress(event.which, '#editorh', '#previewh'));
-    $('#editorv').keyup(event => editorKeyPress(event.which, '#editorv', '#previewv'));
-    $('.preview').mouseover(event => previewMouseOver(event.target));
-    $('.preview').mouseleave(event => clearProperties());
+    $('#__editorh').keyup(event => editorKeyPress(event.which, '#__editorh', '#__previewh'));
+    $('#__editorv').keyup(event => editorKeyPress(event.which, '#__editorv', '#__previewv'));
+    $('.__preview').mouseover(event => __previewMouseOver(event.target));
+    $('.__preview').mouseleave(event => clearProperties());
     $('.showHorizontal').click(() => showHorizontalLayout());
     $('.showVertical').click(() => showVerticalLayout());
     $('.clearEditors').click(() => clearEditors());
+    showHorizontalLayout();
 }
 
 function initialize() {
     // Before wiring up events, setup the common containers.
     setupButtonBar();
-    setupPropertiesContainer();
+    setup__propertiesContainer();
     wireUpEvents();
     demo();
 }
 
 function setupButtonBar() {
-    let html = $('#sourceButtonBar').html();
-    $('.buttonBar').html(html);
+    let html = $('#__sourceButtonBar').html();
+    $('.__buttonBar').html(html);
 }
 
-function setupPropertiesContainer() {
-    let html = $('#sourcePropertiesContainer').html();
-    $('.propertiesContainer').html(html);
+function setup__propertiesContainer() {
+    let html = $('#__sourcePropertiesContainer').html();
+    $('.__propertiesContainer').html(html);
 }
 
-function editorKeyPress(key, sourceEditor, targetPreview) {
+function editorKeyPress(key, sourceEditor, target__preview) {
     let editorText = $(sourceEditor).val();
-    $(targetPreview).html(editorText);
+    $(target__preview).html(editorText);
 }
 
-function previewMouseOver(element) {
-    // Ignore the preview box itself.
-    if (!element.classList.contains('preview')) {
+function __previewMouseOver(element) {
+    // Ignore the __preview box itself.
+    if (!element.classList.contains('__preview')) {
         let tagName = element.tagName;
         console.log(tagName);
-        $('.elementName').text(tagName);
+        $('.__elementName').text(tagName);
     }
     else {
-        $('.elementName').text('');
+        clearProperties();
     }
 }
 
 function clearProperties() {
-    $('.elementName').text('');
+    $('.__elementName').text('');
 }
 
 function showVerticalLayout() {
     copy('h', 'v');
-    $('#verticalView').removeClass('hidden');
-    $('#horizontalView').addClass('hidden');
+    $('#__verticalView').removeClass('__hidden');
+    $('#__horizontalView').addClass('__hidden');
 }
 
 function showHorizontalLayout() {
     copy('v', 'h');
-    $('#verticalView').addClass('hidden');
-    $('#horizontalView').removeClass('hidden');
+    $('#__verticalView').addClass('__hidden');
+    $('#__horizontalView').removeClass('__hidden');
 }
 
 function clearEditors() {
-    $('#editorh').val('');
-    $('#editorv').val('');
-    $('#previewh').html('');
-    $('#previewv').html('');
+    $('#__editorh').val('');
+    $('#__editorv').val('');
+    $('#__previewh').html('');
+    $('#__previewv').html('');
 }
 
 function demo() {
-    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p>Hello World!</p>";
-    $('#editorv').val(demoText);
-    $('#previewv').html(demoText);
+    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p id='hi'>Hello World!</p><div id='div'>DIV Content</div>";
+    $('#__editorv').val(demoText);
+    $('#__previewv').html(demoText);
+    $('#__editorh').val(demoText);
+    $('#__previewh').html(demoText);
 }
 
 // Copy from one editor to the other
 function copy(esource, etarget) {
-    let edSource = '#editor' + esource;
-    let edTarget = '#editor' + etarget;
-    let pTarget = '#preview' + etarget;
+    let edSource = '#__editor' + esource;
+    let edTarget = '#__editor' + etarget;
+    let pTarget = '#__preview' + etarget;
     let editorText = $(edSource).val();
     $(edTarget).val(editorText);
     $(pTarget).html(editorText);
