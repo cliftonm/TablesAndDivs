@@ -181,10 +181,7 @@
 
     <div class='fullscreen hidden' id='horizontalView'>    
         <div class='parent toolbar'>
-            <div class="child-middle-left">
-                <button class='showHorizontal'>Horizontal</button>
-                <button class='showVertical'>Vertical</button>
-            </div>
+            <div class="child-middle-left buttonBar"></div>
         </div>
         <table class='noborders fixed fill'>
             <tr>
@@ -211,10 +208,7 @@
         <table class='noborders fill'>
             <tr style='height:1px;'>
                 <div class='parent toolbar'>
-                    <div class="child-middle-left">
-                        <button class='showHorizontal'>Horizontal</button>
-                        <button class='showVertical'>Vertical</button>
-                    </div>
+                    <div class="child-middle-left buttonBar"></div>
                 </div>
             </tr>
             <tr>
@@ -243,6 +237,12 @@
         </table>
     </div>    
 
+    <div class='hidden' id='sourceButtonBar'>
+        <button class='showHorizontal'>Horizontal</button>
+        <button class='showVertical'>Vertical</button>
+        <button class='clearEditors'>Clear</button>
+    </div>
+
 </body>
 
 <script>
@@ -254,10 +254,18 @@ function wireUpEvents() {
     $('#preview').mouseover(event => previewMouseOver(event.target));
     $('.showHorizontal').click(() => showHorizontalLayout());
     $('.showVertical').click(() => showVerticalLayout());
+    $('.clearEditors').click(() => clearEditors());
 }
 
 function initialize() {
+    // Before wiring up events, setup the common containers.
+    setupButtonBar();
     wireUpEvents();
+}
+
+function setupButtonBar() {
+    let html = $('#sourceButtonBar').html();
+    $('.buttonBar').html(html);
 }
 
 function editorKeyPress(key, sourceEditor, targetPreview) {
@@ -286,6 +294,13 @@ function showHorizontalLayout() {
     copy('v', 'h');
     $('#verticalView').addClass('hidden');
     $('#horizontalView').removeClass('hidden');
+}
+
+function clearEditors() {
+    $('#editorh').val('');
+    $('#editorv').val('');
+    $('#previewh').html('');
+    $('#previewv').html('');
 }
 
 // Copy from one editor to the other
