@@ -194,9 +194,7 @@
                     <div class='preview h100p' id='previewh'></div>
                 </td>
                 <td class='properties'>
-                    <div class='h100p'>
-                        <span class='text-bold' id='elementName'></span>
-                    </div>
+                    <div class='h100p propertiesContainer'></div>
                 </td>
             </tr>
         </table>
@@ -229,9 +227,7 @@
                     </table>
                 </td>
                 <td class='properties'>
-                    <div class='h100p'>
-                        <span class='text-bold' id='elementName'></span>
-                    </div>
+                    <div class='h100p propertiesContainer'></div>
                 </td>
             </tr>
         </table>
@@ -243,6 +239,10 @@
         <button class='clearEditors'>Clear</button>
     </div>
 
+    <div class='hidden' id = 'sourcePropertiesContainer'>
+        <span class='text-bold elementName'></span>
+    </div>
+
 </body>
 
 <script>
@@ -251,7 +251,8 @@ $(document).ready(() => initialize());
 function wireUpEvents() {
     $('#editorh').keyup(event => editorKeyPress(event.which, '#editorh', '#previewh'));
     $('#editorv').keyup(event => editorKeyPress(event.which, '#editorv', '#previewv'));
-    $('#preview').mouseover(event => previewMouseOver(event.target));
+    $('.preview').mouseover(event => previewMouseOver(event.target));
+    $('.preview').mouseleave(event => clearProperties());
     $('.showHorizontal').click(() => showHorizontalLayout());
     $('.showVertical').click(() => showVerticalLayout());
     $('.clearEditors').click(() => clearEditors());
@@ -260,12 +261,19 @@ function wireUpEvents() {
 function initialize() {
     // Before wiring up events, setup the common containers.
     setupButtonBar();
+    setupPropertiesContainer();
     wireUpEvents();
+    demo();
 }
 
 function setupButtonBar() {
     let html = $('#sourceButtonBar').html();
     $('.buttonBar').html(html);
+}
+
+function setupPropertiesContainer() {
+    let html = $('#sourcePropertiesContainer').html();
+    $('.propertiesContainer').html(html);
 }
 
 function editorKeyPress(key, sourceEditor, targetPreview) {
@@ -275,13 +283,18 @@ function editorKeyPress(key, sourceEditor, targetPreview) {
 
 function previewMouseOver(element) {
     // Ignore the preview box itself.
-    if (element.id != 'preview') {
+    if (!element.classList.contains('preview')) {
         let tagName = element.tagName;
-        $('#elementName').text(tagName);
+        console.log(tagName);
+        $('.elementName').text(tagName);
     }
     else {
-        $('#elementName').text('');
+        $('.elementName').text('');
     }
+}
+
+function clearProperties() {
+    $('.elementName').text('');
 }
 
 function showVerticalLayout() {
@@ -301,6 +314,12 @@ function clearEditors() {
     $('#editorv').val('');
     $('#previewh').html('');
     $('#previewv').html('');
+}
+
+function demo() {
+    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p>Hello World!</p>";
+    $('#editorv').val(demoText);
+    $('#previewv').html(demoText);
 }
 
 // Copy from one editor to the other
