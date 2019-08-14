@@ -1,3 +1,9 @@
+<!--
+    Styles defined here carry into the preview because it's embedded HTML.
+    So any styles names common to the editor's HTML will pick up the styles used in the editor!
+    Javascript does not run because the document is already "ready".
+-->
+
 <head>
     <script src='https://code.jquery.com/jquery-3.4.1.min.js'></script>
 </head>
@@ -98,7 +104,6 @@
         white-space:normal;   /* or auto? */
         overflow: auto;
     }
-
 
     .taeditorv {
         height: 100%;
@@ -240,7 +245,7 @@
     </div>
 
     <div class='hidden' id = 'sourcePropertiesContainer'>
-        <span class='text-bold elementName'></span>
+        Element: <span class='text-bold elementName'></span>
     </div>
 
 </body>
