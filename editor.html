@@ -190,11 +190,11 @@
             <tr>
                 <td class='editorhw'>
                     <div class='h100p'>
-                        <textarea class='taeditorh' id='editor'></textarea>
+                        <textarea class='taeditorh' id='editorh'></textarea>
                     </div>
                 </td>
                 <td class='mw1px'>
-                    <div class='preview h100p' id='preview'></div>
+                    <div class='preview h100p' id='previewh'></div>
                 </td>
                 <td class='properties'>
                     <div class='h100p'>
@@ -223,13 +223,13 @@
                         <tr>
                             <td>
                                 <div class='h100p'>
-                                    <textarea class='taeditorv editorel' id='editor'></textarea>
+                                    <textarea class='taeditorv editorel' id='editorv'></textarea>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class='mw1px'>
-                                <div class='preview h100p' id='preview'></div>
+                                <div class='preview h100p' id='previewv'></div>
                             </td>
                         </tr>
                     </table>
@@ -249,7 +249,8 @@
 $(document).ready(() => initialize());
 
 function wireUpEvents() {
-    $('#editor').keyup(event => editorKeyPress(event.which));
+    $('#editorh').keyup(event => editorKeyPress(event.which, '#editorh', '#previewh'));
+    $('#editorv').keyup(event => editorKeyPress(event.which, '#editorv', '#previewv'));
     $('#preview').mouseover(event => previewMouseOver(event.target));
     $('.showHorizontal').click(() => showHorizontalLayout());
     $('.showVertical').click(() => showVerticalLayout());
@@ -259,9 +260,9 @@ function initialize() {
     wireUpEvents();
 }
 
-function editorKeyPress(key) {
-    let editorText = $('#editor').val();
-    $('#preview').html(editorText);
+function editorKeyPress(key, sourceEditor, targetPreview) {
+    let editorText = $(sourceEditor).val();
+    $(targetPreview).html(editorText);
 }
 
 function previewMouseOver(element) {
@@ -276,13 +277,25 @@ function previewMouseOver(element) {
 }
 
 function showVerticalLayout() {
+    copy('h', 'v');
     $('#verticalView').removeClass('hidden');
     $('#horizontalView').addClass('hidden');
 }
 
 function showHorizontalLayout() {
+    copy('v', 'h');
     $('#verticalView').addClass('hidden');
     $('#horizontalView').removeClass('hidden');
+}
+
+// Copy from one editor to the other
+function copy(esource, etarget) {
+    let edSource = '#editor' + esource;
+    let edTarget = '#editor' + etarget;
+    let pTarget = '#preview' + etarget;
+    let editorText = $(edSource).val();
+    $(edTarget).val(editorText);
+    $(pTarget).html(editorText);
 }
 
 </script>
