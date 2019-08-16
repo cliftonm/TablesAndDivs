@@ -16,10 +16,12 @@ $(el).css('width', '50%')
 <style>
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom___properties */
     :root {
-        --__propertyWidth: 200px;
+        --__propertyWidth: 250px;
         --__toolbarHeight: 30px;
+        --__propertyLabelWidth: 80px;
+        --__propertyFieldWidth: 135px;
     }
-
+/*
     div {
         border-style:solid;
         border-width: 1px;
@@ -44,10 +46,14 @@ $(el).css('width', '50%')
         border-style:solid;
         border-width: 1px;
     }
-
+*/
     body {
         padding:0; 
         margin:0;
+    }
+
+    textarea {
+        border-style:none;
     }
 
     .__noborders {
@@ -74,8 +80,8 @@ $(el).css('width', '50%')
 */
 
     .__fullscreen {
-        width:calc(100% - 2px); 
-        height:calc(100vh - 2px);
+        width:calc(100% - 5px); 
+        height:calc(100vh - 35px); /* why can't I use var(--toolbarHeight) ? */
         padding: 0;
         margin: 0;
     }
@@ -184,6 +190,32 @@ $(el).css('width', '50%')
         display: none;
     }
 
+    .__propertyLabel {
+        float: left;   /* without this, width is ignored */
+        width: var(--__propertyLabelWidth);
+    }
+
+    .__propertyField {
+        width: var(--__propertyFieldWidth);
+        margin-left: 5px;
+    }
+
+    .__propertyItem {
+        margin-bottom:3px;
+        padding-left: 5px;
+    }
+
+    .__section {
+        background-color: #ddd;
+        margin-top: 7px;
+        margin-bottom: 3px;
+    }
+
+    .__sectionBar {
+        padding-left: 5px;
+        padding-bottom: 1px;
+    }
+
 </style>
 
 <body>
@@ -196,15 +228,15 @@ $(el).css('width', '50%')
         <table class='__noborders __fixed __fill'>
             <tr>
                 <td class='__editorhw'>
-                    <div class='__h100p'>
+                    <div class='__h100p __border1'>
                         <textarea class='__taeditorh' id='__editorh'></textarea>
                     </div>
                 </td>
                 <td class='__mw1px'>
-                    <div class='__preview __h100p' id='__previewh'></div>
+                    <div class='__preview __h100p __border1' id='__previewh'></div>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p __propertiesContainer'></div>
+                    <div class='__h100p  __border1 __propertiesContainer'></div>
                 </td>
             </tr>
         </table>
@@ -224,20 +256,20 @@ $(el).css('width', '50%')
                     <table class='__noborders __fill'>
                         <tr>
                             <td>
-                                <div class='__h100p'>
+                                <div class='__h100p __border1'>
                                     <textarea class='__taeditorv' id='__editorv'></textarea>
                                 </div>
                             </td>
                         </tr>
                         <tr>
                             <td class='__mw1px'>
-                                <div class='__preview __h100p' id='__previewv'></div>
+                                <div class='__preview __border1 __h100p' id='__previewv'></div>
                             </td>
                         </tr>
                     </table>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p __propertiesContainer'></div>
+                    <div class='__h100p __border1 __propertiesContainer'></div>
                 </td>
             </tr>
         </table>
@@ -250,13 +282,37 @@ $(el).css('width', '50%')
     </div>
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
-        Element: <span class='__text-bold __elementName'></span>
+        <div class='__propertyItem'>Element: <span class='__text-bold __elementTagName'></span></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__propertyField'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__propertyField'></div>
+        <div id='__sections'></div>
     </div>
 
-</body>
+    <div class='__hidden' id = '__sectionTemplate'>
+        <div class='__propertItem __section __sectionBar' id='__sectionName{sectionName}'>{sectionName}</div>
+    </div>
+
+    <div class='__hidden' id = '__styleTemplate'>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField'></div>
+    </div>
+    </body>
 
 <script>
+String.prototype.replaceAll = function(search, replacement) {
+    var target = this;
+    return target.replace(new RegExp(search, 'g'), replacement);
+};
+
 $(document).ready(() => initialize());
+
+function initialize() {
+    // Before wiring up events, setup the common containers.
+    setupButtonBar();
+    setupSourcePropertiesContainer();
+    setupPropertiesContainer();
+    wireUpEvents();
+    demo();
+}
 
 function wireUpEvents() {
     $('#__editorh').keyup(event => editorKeyPress(event.which, '#__editorh', '#__previewh'));
@@ -269,20 +325,67 @@ function wireUpEvents() {
     showHorizontalLayout();
 }
 
-function initialize() {
-    // Before wiring up events, setup the common containers.
-    setupButtonBar();
-    setup__propertiesContainer();
-    wireUpEvents();
-    demo();
-}
-
 function setupButtonBar() {
     let html = $('#__sourceButtonBar').html();
     $('.__buttonBar').html(html);
 }
 
-function setup__propertiesContainer() {
+function setupSourcePropertiesContainer() {
+    let sections = [
+        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
+    ];
+    let sectionNames=sections.map(s => s.name);
+
+    let sectionTemplate = $('#__sectionTemplate').html();
+    let sectionContent = [];
+    let sectionNameIds = [];
+    
+    sectionNames.forEach(n =>
+    {
+        let sectionName = '__sectionName' + n;
+        let contentName = '__content' + n;
+        let st = sectionTemplate.replaceAll('{sectionName}', n);
+        st = st + "<div id='" + contentName + "'>";
+        st = insertStyles(sections.filter(s => s.name == n)[0].styles, st);
+        st = st + "</div>";
+        sectionContent.push(st);
+        sectionNameIds.push({section: '#' + sectionName, content: '#' + contentName});
+    });
+
+    $("#__sections").html(sectionContent.join(''));
+
+    sectionNameIds.forEach(sni =>
+    {
+        // When clicking on the section div, show or hide the content.
+        // This doesn't work:
+        // $(sni.section).on('click', () => showOrHideContent(sni.content));
+        // We have to wire this up at the document level and pass in the selector!
+        // See: https://stackoverflow.com/a/29674985/2276361
+        $(document).on('click', sni.section, () => showOrHideContent(sni.content));
+    })
+}
+
+function insertStyles(styles, template) {
+    let styleTemplate = $('#__styleTemplate').html();
+
+    styles.forEach(s =>
+    {
+        template = template + styleTemplate.replace('{name}', s);
+    });
+
+    return template;
+}
+
+function showOrHideContent(id) {
+    if ($(id).hasClass('__hidden')) {
+        $(id).removeClass('__hidden');
+    } else {
+        $(id).addClass('__hidden');
+    }
+}
+
+function setupPropertiesContainer() {
     let html = $('#__sourcePropertiesContainer').html();
     $('.__propertiesContainer').html(html);
 }
@@ -297,7 +400,7 @@ function __previewMouseOver(element) {
     if (!element.classList.contains('__preview')) {
         let tagName = element.tagName;
         console.log(tagName);
-        $('.__elementName').text(tagName);
+        $('.__elementTagName').text(tagName);
     }
     else {
         clearProperties();
@@ -305,7 +408,7 @@ function __previewMouseOver(element) {
 }
 
 function clearProperties() {
-    $('.__elementName').text('');
+    $('.__elementTagName').text('');
 }
 
 function showVerticalLayout() {
