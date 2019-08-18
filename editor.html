@@ -236,7 +236,9 @@ $(el).css('width', '50%')
                     <div class='__preview __h100p __border1' id='__previewh'></div>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p  __border1 __propertiesContainer'></div>
+                    <div class='__h100p  __border1'>
+                        <div class='__propertiesContainer'></div>
+                    </div>
                 </td>
             </tr>
         </table>
@@ -293,7 +295,7 @@ $(el).css('width', '50%')
     </div>
 
     <div class='__hidden' id = '__styleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}'></div>
     </div>
     </body>
 
@@ -302,6 +304,11 @@ String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
+
+var altKeyDown = false;
+var ctrlKeyDown = false;
+var hoverElement = undefined;
+var selectedElement = undefined;
 
 $(document).ready(() => initialize());
 
@@ -317,8 +324,12 @@ function initialize() {
 function wireUpEvents() {
     $('#__editorh').keyup(event => editorKeyPress(event.which, '#__editorh', '#__previewh'));
     $('#__editorv').keyup(event => editorKeyPress(event.which, '#__editorv', '#__previewv'));
-    $('.__preview').mouseover(event => __previewMouseOver(event.target));
+    $('#__editorh').keydown(event => editorKeyDown(event));
+    $('#__editorv').keydown(event => editorKeyDown(event));
+    $('.__preview').mouseover(event => previewMouseOver(event.target));
     $('.__preview').mouseleave(event => clearProperties());
+    $('.__preview').keydown(event => previewKeyDown(event));
+    $('.__preview').click(event => previewClick(event));
     $('.showHorizontal').click(() => showHorizontalLayout());
     $('.showVertical').click(() => showVerticalLayout());
     $('.clearEditors').click(() => clearEditors());
@@ -330,12 +341,18 @@ function setupButtonBar() {
     $('.__buttonBar').html(html);
 }
 
-function setupSourcePropertiesContainer() {
-    let sections = [
+var sections = [
         {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
         {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
     ];
-    let sectionNames=sections.map(s => s.name);
+
+var tagSections = [
+    {tag: 'p', sections: ['Dimensions', 'Font']},
+    {tag: 'div', sections: ['Dimensions']}
+];
+
+function setupSourcePropertiesContainer() {
+    let sectionNames = sections.map(s => s.name);
 
     let sectionTemplate = $('#__sectionTemplate').html();
     let sectionContent = [];
@@ -362,7 +379,7 @@ function setupSourcePropertiesContainer() {
         // $(sni.section).on('click', () => showOrHideContent(sni.content));
         // We have to wire this up at the document level and pass in the selector!
         // See: https://stackoverflow.com/a/29674985/2276361
-        $(document).on('click', sni.section, () => showOrHideContent(sni.content));
+        $(document).on('click', sni.section, () => showOrHideSectionContent(sni.content));
     })
 }
 
@@ -371,13 +388,13 @@ function insertStyles(styles, template) {
 
     styles.forEach(s =>
     {
-        template = template + styleTemplate.replace('{name}', s);
+        template = template + styleTemplate.replaceAll('{name}', s);
     });
 
     return template;
 }
 
-function showOrHideContent(id) {
+function showOrHideSectionContent(id) {
     if ($(id).hasClass('__hidden')) {
         $(id).removeClass('__hidden');
     } else {
@@ -390,25 +407,165 @@ function setupPropertiesContainer() {
     $('.__propertiesContainer').html(html);
 }
 
-function editorKeyPress(key, sourceEditor, target__preview) {
-    let editorText = $(sourceEditor).val();
-    $(target__preview).html(editorText);
+function editorKeyPress(key, sourceEditor, targetPreview) {
+    let editor = $(sourceEditor);
+    let preview = $(targetPreview);
+    let editorText = editor.val();
+
+    if (altKeyDown) {
+        let start = editor[0].selectionStart;
+        let end = editor[0].selectionEnd;
+        let s1 = editorText.substring(0, start);
+        let s2 = editorText.substring(end);
+        let between = editorText.substring(start, end);
+
+        switch(key) {
+            // TODO: argh, why uppercase?  Maybe instead convert key to its charcode?
+            case 'C'.charCodeAt(0):
+                insertTags(editor, preview, '<code>', '</code>', s1, between, s2, end);
+                break;
+            case 'P'.charCodeAt(0):
+                insertTags(editor, preview, '<pre>', '</pre>', s1, between, s2, end);
+                break;
+            case 'B'.charCodeAt(0):
+                toggleTags(editor, preview, '<b>', '</b>', editorText, s1, between, s2, start, end);
+                break;
+            case 'I'.charCodeAt(0):
+                toggleTags(editor, preview, '<i>', '</i>', editorText, s1, between, s2, start, end);
+                break;
+        }
+    } else {
+        preview.html(editorText);
+    }
 }
 
-function __previewMouseOver(element) {
-    // Ignore the __preview box itself.
-    if (!element.classList.contains('__preview')) {
-        let tagName = element.tagName;
-        console.log(tagName);
-        $('.__elementTagName').text(tagName);
+function insertTags(editor, preview, t1, t2, s1, between, s2, end) {
+    let newText = s1 + t1 + between + t2 + s2;
+    let newIdx = end + t1.length + t2.length;
+    $(editor).val(newText);                
+
+    // Set cursor to end of selection.
+    editor[0].selectionStart = newIdx;
+    editor[0].selectionEnd = newIdx;
+
+    preview.html(newText);
+}
+
+// Not the smartest toggling, as it doesn't search for the outermost tags but only
+// if they are immediately adjecent to the selected text.
+function toggleTags(editor, preview, t1, t2, editorText, s1, between, s2, start, end) {
+    var newText = editorText;
+
+    if (start - t1.length >= 0 && 
+        (editorText.substring(start-t1.length, start) == t1) &&
+        end + t1.length < editorText.length &&
+        (editorText.substring(end, end + t2.length) == t2) ) {
+        // Remove tags
+        s1 = editorText.substring(0, start - t1.length);
+        between = editorText.substring(start, end);
+        s2 = editorText.substring(end + t2.length);
+        newText = s1 + between + s2;
+        $(editor).val(newText);                
+
+        // Preserve selected text.
+        editor[0].selectionStart = start - t1.length;
+        editor[0].selectionEnd = end - t1.length;
+    } else {
+    // Add tags.
+        newText = s1 + t1 + between + t2 + s2;
+        $(editor).val(newText);                
+
+        // Preserve selected text.
+        editor[0].selectionStart = start + t1.length;
+        editor[0].selectionEnd = end + t1.length;
+    }
+
+    preview.html(newText);
+}
+
+// The event wired up here creates a gazillion events as long as the ALT key
+// is pressed.  There must be a better way!
+function editorKeyDown(event) {
+    altKeyDown = event.altKey;
+    ctrlKeyDown = event.ctrlKey;
+}
+
+function previewClick(event) {
+    selectedElement = hoverElement;
+
+    if (selectedElement) {
+        showProperties(selectedElement);
+    } else {
+        clearProperties();
+    }
+}
+
+function previewMouseOver(element) {
+    // Setup for mouse click elsewhere.
+    if (element.classList.contains('__preview')) {
+        hoverElement = undefined;
+    } else {
+        hoverElement = element;
+    }
+
+    // Ignore the __preview box itself and, if we have a selected element, don't update the property list during a hover.
+    if (!element.classList.contains('__preview') && !selectedElement) {
+        showProperties(element);
     }
     else {
         clearProperties();
     }
 }
 
+function showProperties(element) {
+    let tagName = element.tagName;
+    $('.__elementTagName').text(tagName);
+    $('.__propertiesContainer').removeClass('__hidden');
+    showAllowableSections(tagName);
+    populateStyleValues(element, tagName);
+}
+
 function clearProperties() {
-    $('.__elementTagName').text('');
+    if (!selectedElement) {
+        $('.__elementTagName').text('');
+        $('.__propertiesContainer').addClass('__hidden');
+        hoverElement = undefined;
+    }
+}
+
+function showAllowableSections(tagName) {
+    let lcTagName = tagName.toLowerCase();
+    let sectionNames = sections.map(s => s.name);
+    let allowableSections = tagSections.filter(s => s.tag == lcTagName)[0].sections;
+
+    sectionNames.forEach(sn => {
+        let sectionName = '#__sectionName' + sn;
+        let contentName = '#__content' + sn;
+        if (allowableSections.includes(sn)) {
+            $(sectionName).removeClass('__hidden');
+            $(contentName).removeClass('__hidden');
+        } else {
+            $(sectionName).addClass('__hidden');
+            $(contentName).addClass('__hidden');
+        }
+    });
+}
+
+function populateStyleValues(el, tagName) {
+    let lcTagName = tagName.toLowerCase();
+    let sectionNames = sections.map(s => s.name);
+    let allowableSections = tagSections.filter(s => s.tag == lcTagName)[0].sections;
+
+    allowableSections.forEach(s =>
+    {
+        let sectionStyles = sections.filter(section => section.name == s)[0].styles;
+        sectionStyles.forEach(sectStyle =>
+        {
+            let styleValue = $(el).css(sectStyle);
+            let inputElement = '#__inputProperty' + sectStyle;
+            $(inputElement).val(styleValue);
+        });
+    });
 }
 
 function showVerticalLayout() {
