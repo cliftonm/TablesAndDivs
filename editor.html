@@ -309,7 +309,9 @@ var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
 var selectedElement = undefined;
-var sectionContentState = [];
+
+// For preserving section content visibility when we click on tags.
+var sectionContentVisible = [];     
 
 $(document).ready(() => initialize());
 
@@ -372,6 +374,9 @@ function setupSourcePropertiesContainer() {
         st = st + "</div>";
         sectionContent.push(st);
         sectionNameIds.push({section: '#' + sectionName, content: '#' + contentName});
+
+        // All section content initially visible
+        sectionContentVisible['#' + contentName] = true;
     });
 
     $("#__sections").html(sectionContent.join(''));
@@ -420,8 +425,10 @@ function insertStyles(styles, template) {
 function showOrHideSectionContent(id) {
     if ($(id).hasClass('__hidden')) {
         $(id).removeClass('__hidden');
+        sectionContentVisible[id] = true;
     } else {
         $(id).addClass('__hidden');
+        sectionContentVisible[id] = false;
     }
 }
 
@@ -566,8 +573,17 @@ function showAllowableSections(tagName) {
         let contentName = '#__content' + sn;
         if (allowableSections.includes(sn)) {
             $(sectionName).removeClass('__hidden');
-            $(contentName).removeClass('__hidden');
+
+            console.log(sectionContentVisible);
+
+            // Restore state when section can be displayed.
+            if (sectionContentVisible[contentName]) {
+                $(contentName).removeClass('__hidden');
+            } else {
+                $(contentName).addClass('__hidden');
+            }
         } else {
+            // always hide if excluded.
             $(sectionName).addClass('__hidden');
             $(contentName).addClass('__hidden');
         }
