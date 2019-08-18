@@ -7,6 +7,14 @@ let el = document.getElementById('div');
 
 $(el).css('width')
 $(el).css('width', '50%')
+
+Things classes are used for:
+
+classes
+    specific styles where the CSS is typically one line
+    style of a component where the CSS will typically include many styles
+selectors in JS
+
 -->
 
 <head>
@@ -277,16 +285,18 @@ $(el).css('width', '50%')
         </table>
     </div>    
 
+    // Templates:
+
     <div class='__hidden' id='__sourceButtonBar'>
-        <button class='showHorizontal'>Horizontal</button>
-        <button class='showVertical'>Vertical</button>
-        <button class='clearEditors'>Clear</button>
+        <button class='__showHorizontal'>Horizontal</button>
+        <button class='__showVertical'>Vertical</button>
+        <button class='__clearEditors'>Clear</button>
     </div>
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
         <div class='__propertyItem'>Element: <span class='__text-bold __elementTagName'></span></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__propertyField'></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__propertyField'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__propertyField __propertyName'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__propertyField __propertyId'></div>
         <div id='__sections'></div>
     </div>
 
@@ -331,11 +341,18 @@ function wireUpEvents() {
     $('#__editorv').keydown(event => editorKeyDown(event));
     $('.__preview').mouseover(event => previewMouseOver(event.target));
     $('.__preview').mouseleave(event => clearProperties());
-    $('.__preview').keydown(event => previewKeyDown(event));
     $('.__preview').click(event => previewClick(event));
-    $('.showHorizontal').click(() => showHorizontalLayout());
-    $('.showVertical').click(() => showVerticalLayout());
-    $('.clearEditors').click(() => clearEditors());
+    $('.__showHorizontal').click(() => showHorizontalLayout());
+    $('.__showVertical').click(() => showVerticalLayout());
+    $('.__clearEditors').click(() => clearEditors());
+
+    // Handle CR
+    $('.__propertyName').keypress((event) => propertyNameKeyPress(event));
+    $('.__propertyId').keypress((event) => propertyIdKeyPress(event));
+
+    // Handle lose focus
+    $('.__propertyName').blur((event) => updateElementName(event));
+    $('.__propertyId').blur((event) => updateElementId(event));
     showHorizontalLayout();
 }
 
@@ -398,17 +415,46 @@ function setupSourcePropertiesContainer() {
         {
             let inputElement = '#__inputProperty' + sectStyle;
             $(document).on('keypress', inputElement, onInputKeyPress);
+            $(document).on('blur', inputElement, updateElementStyle);
         });
     });
 }
 
 function onInputKeyPress(event) {
     if (event.keyCode == 13) {
-        let el = $('#' + event.target.id);
-        let val = el.val();
-        let attr = $(el).attr('cssName');
-        $(selectedElement).css(attr, val);       
+        updateElementStyle(event);
     }
+}
+
+function updateElementStyle(event) {
+    let el = $('#' + event.target.id);
+    let val = el.val();
+    let attr = $(el).attr('cssName');
+    $(selectedElement).css(attr, val);       
+}
+
+function propertyNameKeyPress(event) {
+    if (event.keyCode == 13) {
+        updateElementName(event);
+    }
+}
+
+function propertyIdKeyPress(event) {
+    if (event.keyCode == 13) {
+        updateElementId(event);
+    }
+}
+
+function updateElementName(event) {
+    let el = $(event.currentTarget);
+    let val = el.val();
+    $(selectedElement).attr('name', val);       
+}
+
+function updateElementId(event) {
+    let el = $(event.currentTarget);
+    let val = el.val();
+    $(selectedElement).attr('id', val);       
 }
 
 function insertStyles(styles, template) {
@@ -551,6 +597,8 @@ function showProperties(element) {
     let tagName = element.tagName;
     $('.__elementTagName').text(tagName);
     $('.__propertiesContainer').removeClass('__hidden');
+    $('.__propertyName').val($(element).attr('name'));
+    $('.__propertyId').val($(element).attr('id'));
     showAllowableSections(tagName);
     populateStyleValues(element, tagName);
 }
