@@ -18,8 +18,8 @@ $(el).css('width', '50%')
     :root {
         --__propertyWidth: 250px;
         --__toolbarHeight: 30px;
-        --__propertyLabelWidth: 80px;
-        --__propertyFieldWidth: 135px;
+        --__propertyLabelWidth: 100px;
+        --__propertyFieldWidth: 115px;
     }
 /*
     div {
@@ -295,7 +295,7 @@ $(el).css('width', '50%')
     </div>
 
     <div class='__hidden' id = '__styleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}' cssName='{name}'></div>
     </div>
     </body>
 
@@ -309,6 +309,7 @@ var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
 var selectedElement = undefined;
+var sectionContentState = [];
 
 $(document).ready(() => initialize());
 
@@ -343,12 +344,15 @@ function setupButtonBar() {
 
 var sections = [
         {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
+        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
         {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
+        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
     ];
 
 var tagSections = [
-    {tag: 'p', sections: ['Dimensions', 'Font']},
-    {tag: 'div', sections: ['Dimensions']}
+    {tag: 'p', sections: ['Dimensions', 'Margins', 'Padding', 'Font', 'Border']},
+    {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']}
 ];
 
 function setupSourcePropertiesContainer() {
@@ -381,6 +385,25 @@ function setupSourcePropertiesContainer() {
         // See: https://stackoverflow.com/a/29674985/2276361
         $(document).on('click', sni.section, () => showOrHideSectionContent(sni.content));
     })
+
+    // Also wire up future property style input boxes events.
+    sections.forEach(section =>
+    {
+        section.styles.forEach(sectStyle =>
+        {
+            let inputElement = '#__inputProperty' + sectStyle;
+            $(document).on('keypress', inputElement, onInputKeyPress);
+        });
+    });
+}
+
+function onInputKeyPress(event) {
+    if (event.keyCode == 13) {
+        let el = $('#' + event.target.id);
+        let val = el.val();
+        let attr = $(el).attr('cssName');
+        $(selectedElement).css(attr, val);       
+    }
 }
 
 function insertStyles(styles, template) {
