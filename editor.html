@@ -285,7 +285,7 @@ selectors in JS
         </table>
     </div>    
 
-    // Templates:
+    <!-- Templates: -->
 
     <div class='__hidden' id='__sourceButtonBar'>
         <button class='__showHorizontal'>Horizontal</button>
@@ -558,9 +558,9 @@ function editorKeyPress(key, sourceEditor, targetPreview) {
                     toggleTags(editor, preview, '<i>', '</i>', editorText, s1, between, s2, start, end);
                     break;
             }
-        } else {
-            preview.html(editorText);
         }
+    } else {
+        preview.html(editorText);
     }
 }
 
