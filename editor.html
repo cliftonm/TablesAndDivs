@@ -307,7 +307,11 @@ selectors in JS
     <div class='__hidden' id = '__styleTemplate'>
         <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}' cssName='{name}'></div>
     </div>
-    </body>
+
+    <div class='__hidden' id = '__checkboxStyleTemplate'>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}' type='checkbox' cssName='{name}'></div>
+    </div>
+</body>
 
 <script>
 class LocalStore {
@@ -384,16 +388,18 @@ function setupButtonBar() {
 }
 
 var sections = [
-        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
-        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
-        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
-        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
-        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
+//        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+//        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
+//        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
+//        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
+//        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
+        {name:'Flags', styles: [{style:'readonly', control:'checkbox'}]}
     ];
 
 var tagSections = [
+    {tag: 'input', sections: ['Margins', 'Padding', 'Flags']},
     {tag: 'p', sections: ['Dimensions', 'Margins', 'Padding', 'Font', 'Border']},
-    {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']}
+    {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']},
 ];
 
 function setupSourcePropertiesContainer() {
@@ -437,11 +443,30 @@ function setupSourcePropertiesContainer() {
     {
         section.styles.forEach(sectStyle =>
         {
-            let inputElement = '#__inputProperty' + sectStyle;
-            $(document).on('keypress', inputElement, onInputKeyPress);
-            $(document).on('blur', inputElement, updateElementStyle);
+            if (typeof(sectStyle) == 'string') {
+                // we're defaulting to an input box
+                let inputElement = '#__inputProperty' + sectStyle;
+                $(document).on('keypress', inputElement, onInputKeyPress);
+                $(document).on('blur', inputElement, updateElementStyle);
+            } else {
+                // an object with form {style:'[style]', control:'[control]'}
+                switch(sectStyle.control)
+                {
+                    case 'checkbox':
+                        let inputElement = '#__inputProperty' + sectStyle.style;
+                        $(document).on('click', inputElement, onCheckbox);
+                        break;
+                }
+            }
         });
     });
+}
+
+function onCheckbox(event) {
+    let el = $('#' + event.currentTarget.id);
+    let attr = $(el).attr('cssName');
+    let checked = el.is(':checked');
+    $(selectedElement).prop(attr, checked);       
 }
 
 function onInputKeyPress(event) {
@@ -496,7 +521,15 @@ function insertStyles(styles, template) {
 
     styles.forEach(s =>
     {
-        template = template + styleTemplate.replaceAll('{name}', s);
+        if (typeof(s) == 'string') {
+            template = template + styleTemplate.replaceAll('{name}', s);
+        } else {
+            // An object with form {style:'[style]', control:'[control]'}
+            // The default is [control]StyleTemplate to override the "input" template.
+            // TODO: If the style itself defines a 'template', then override again.
+            let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
+            template = template + overrideTemplate.replaceAll('{name}', s.style);
+        }
     });
 
     return template;
@@ -692,13 +725,25 @@ function populateStyleValues(el, tagName) {
 
     allowableSections.forEach(s =>
     {
-        let sectionStyles = sections.filter(section => section.name == s)[0].styles;
-        sectionStyles.forEach(sectStyle =>
-        {
-            let styleValue = $(el).css(sectStyle);
-            let inputElement = '#__inputProperty' + sectStyle;
-            $(inputElement).val(styleValue);
-        });
+        if (sections.filter(section => section.name == s).length > 0) {
+            let sectionStyles = sections.filter(section => section.name == s)[0].styles;
+            sectionStyles.forEach(sectStyle =>
+            {
+                if (typeof(sectStyle) == 'string')
+                {
+                    let styleValue = $(el).css(sectStyle);
+                    let inputElement = '#__inputProperty' + sectStyle;
+                    $(inputElement).val(styleValue);
+                } else {
+                    let styleValue = $(el).css(sectStyle.style);
+                    let inputElement = '#__inputProperty' + sectStyle.style;
+                    $(inputElement).val(styleValue);
+                }
+            });
+        } else {
+            console.log('Section ' + s + ' is not defined.');
+        }
+
     });
 }
 
@@ -726,7 +771,7 @@ function clearEditors() {
 }
 
 function demo() {
-    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p id='hi'>Hello World!</p><div id='div'>DIV Content</div>";
+    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p id='hi'>Hello World!</p><div id='div'>DIV Content</div><input value='An Input'></input>";
     $('#__editorv').val(demoText);
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
