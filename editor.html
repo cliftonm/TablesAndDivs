@@ -310,6 +310,16 @@ selectors in JS
     </body>
 
 <script>
+class LocalStore {
+    static put(name, value) {
+        window.localStorage.setItem(name, value);
+    }
+
+    static get (name) {
+        return window.localStorage.getItem(name);
+    }
+}
+
 String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
@@ -319,6 +329,8 @@ var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
 var selectedElement = undefined;
+var currentEditor = undefined;
+var currentPreview = undefined;
 
 // For preserving section content visibility when we click on tags.
 var sectionContentVisible = [];     
@@ -327,6 +339,8 @@ $(document).ready(() => initialize());
 
 function initialize() {
     // Before wiring up events, setup the common containers.
+    // let sv = LocalStore.get('sectionContentVisible') == "";
+    // sectionContentVisible = (sv == "" ? [] : sv);
     setupButtonBar();
     setupSourcePropertiesContainer();
     setupPropertiesContainer();
@@ -351,8 +365,16 @@ function wireUpEvents() {
     $('.__propertyId').keypress((event) => propertyIdKeyPress(event));
 
     // Handle lose focus
-    $('.__propertyName').blur((event) => updateElementName(event));
-    $('.__propertyId').blur((event) => updateElementId(event));
+    $('.__propertyName').blur((event) => {
+        updateElementName(event);
+        updateSource();
+    });
+
+    $('.__propertyId').blur((event) => {
+        updateElementId(event);
+        updateSource();
+    });
+
     showHorizontalLayout();
 }
 
@@ -396,6 +418,8 @@ function setupSourcePropertiesContainer() {
         sectionContentVisible['#' + contentName] = true;
     });
 
+    // LocalStore.put('sectionContentVisible', 1);
+
     $("#__sections").html(sectionContent.join(''));
 
     sectionNameIds.forEach(sni =>
@@ -423,7 +447,29 @@ function setupSourcePropertiesContainer() {
 function onInputKeyPress(event) {
     if (event.keyCode == 13) {
         updateElementStyle(event);
+        updateSource();
     }
+}
+
+function propertyNameKeyPress(event) {
+    if (event.keyCode == 13) {
+        updateElementName(event);
+        updateSource();
+    }
+}
+
+function propertyIdKeyPress(event) {
+    if (event.keyCode == 13) {
+        updateElementId(event);
+        updateSource();
+    }
+}
+
+function updateSource() {
+    let editor = $(currentEditor);
+    let preview = $(currentPreview);
+    let text = preview.html();
+    editor.val(text);
 }
 
 function updateElementStyle(event) {
@@ -431,18 +477,6 @@ function updateElementStyle(event) {
     let val = el.val();
     let attr = $(el).attr('cssName');
     $(selectedElement).css(attr, val);       
-}
-
-function propertyNameKeyPress(event) {
-    if (event.keyCode == 13) {
-        updateElementName(event);
-    }
-}
-
-function propertyIdKeyPress(event) {
-    if (event.keyCode == 13) {
-        updateElementId(event);
-    }
 }
 
 function updateElementName(event) {
@@ -476,6 +510,8 @@ function showOrHideSectionContent(id) {
         $(id).addClass('__hidden');
         sectionContentVisible[id] = false;
     }
+
+    // LocalStore.put('sectionContentVisible', sectionContentVisible);
 }
 
 function setupPropertiesContainer() {
@@ -488,30 +524,43 @@ function editorKeyPress(key, sourceEditor, targetPreview) {
     let preview = $(targetPreview);
     let editorText = editor.val();
 
-    if (altKeyDown) {
+    if (ctrlKeyDown || altKeyDown) {
         let start = editor[0].selectionStart;
         let end = editor[0].selectionEnd;
         let s1 = editorText.substring(0, start);
         let s2 = editorText.substring(end);
         let between = editorText.substring(start, end);
 
-        switch(key) {
-            // TODO: argh, why uppercase?  Maybe instead convert key to its charcode?
-            case 'C'.charCodeAt(0):
-                insertTags(editor, preview, '<code>', '</code>', s1, between, s2, end);
-                break;
-            case 'P'.charCodeAt(0):
-                insertTags(editor, preview, '<pre>', '</pre>', s1, between, s2, end);
-                break;
-            case 'B'.charCodeAt(0):
-                toggleTags(editor, preview, '<b>', '</b>', editorText, s1, between, s2, start, end);
-                break;
-            case 'I'.charCodeAt(0):
-                toggleTags(editor, preview, '<i>', '</i>', editorText, s1, between, s2, start, end);
-                break;
+        if (altKeyDown) {
+            let start = editor[0].selectionStart;
+            let end = editor[0].selectionEnd;
+            let s1 = editorText.substring(0, start);
+            let s2 = editorText.substring(end);
+            let between = editorText.substring(start, end);
+
+            switch(key) {
+                // TODO: argh, why uppercase?  Maybe instead convert key to its charcode?
+                case 'C'.charCodeAt(0):
+                    insertTags(editor, preview, '<code>', '</code>', s1, between, s2, end);
+                    break;
+                case 'P'.charCodeAt(0):
+                    insertTags(editor, preview, '<pre>', '</pre>', s1, between, s2, end);
+                    break;
+            }
         }
-    } else {
-        preview.html(editorText);
+
+        if (ctrlKeyDown) {
+            switch(key) {            
+                case 'B'.charCodeAt(0):
+                    toggleTags(editor, preview, '<b>', '</b>', editorText, s1, between, s2, start, end);
+                    break;
+                case 'I'.charCodeAt(0):
+                    toggleTags(editor, preview, '<i>', '</i>', editorText, s1, between, s2, start, end);
+                    break;
+            }
+        } else {
+            preview.html(editorText);
+        }
     }
 }
 
@@ -622,8 +671,6 @@ function showAllowableSections(tagName) {
         if (allowableSections.includes(sn)) {
             $(sectionName).removeClass('__hidden');
 
-            console.log(sectionContentVisible);
-
             // Restore state when section can be displayed.
             if (sectionContentVisible[contentName]) {
                 $(contentName).removeClass('__hidden');
@@ -659,12 +706,16 @@ function showVerticalLayout() {
     copy('h', 'v');
     $('#__verticalView').removeClass('__hidden');
     $('#__horizontalView').addClass('__hidden');
+    currentEditor = '#__editorv';
+    currentPreview = '#__previewv';
 }
 
 function showHorizontalLayout() {
     copy('v', 'h');
     $('#__verticalView').addClass('__hidden');
     $('#__horizontalView').removeClass('__hidden');
+    currentEditor = '#__editorh';
+    currentPreview = '#__previewh';
 }
 
 function clearEditors() {
