@@ -308,7 +308,7 @@ selectors in JS
         <div class='__propertItem __section __sectionBar' id='__sectionName{sectionName}'>{sectionName}</div>
     </div>
 
-    <div class='__hidden' id = '__styleTemplate'>
+    <div class='__hidden' id = '__inputStyleTemplate'>
         <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__inputPropertyField' id='__inputProperty{name}' cssName='{name}'></div>
     </div>
 
@@ -351,11 +351,29 @@ function initialize() {
     // Before wiring up events, setup the common containers.
     // let sv = LocalStore.get('sectionContentVisible') == "";
     // sectionContentVisible = (sv == "" ? [] : sv);
+    initializeSections();
     setupButtonBar();
     setupSourcePropertiesContainer();
     setupPropertiesContainer();
     wireUpEvents();
     demo();
+}
+
+// The purpose of this is to take the simpler (more human friendly) version of this:
+// {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+// and convert the styles to an array of objects that looks like this:
+// styles: [{style:'width', control:'input'}]
+// That way we can get rid off all the horrid if-else checks when dealing with the style formatting.
+function initializeSections()
+{
+    sections.forEach(s => {
+        let i = 0;
+        for (i = 0; i < s.styles.length; i++) {
+            if (typeof(s.styles[i]) == 'string') {
+                s.styles[i] = {style: s.styles[i], control: 'input'};
+            }
+        }
+    });
 }
 
 function wireUpEvents() {
@@ -449,21 +467,8 @@ function setupSourcePropertiesContainer() {
     {
         section.styles.forEach(sectStyle =>
         {
-            if (typeof(sectStyle) == 'string') {
-                // we're defaulting to an input box
-                let inputElement = '#__inputProperty' + sectStyle;
-                $(document).on('keypress', inputElement, onInputKeyPress);
-                $(document).on('blur', inputElement, updateElementStyle);
-            } else {
-                // an object with form {style:'[style]', control:'[control]'}
-                switch(sectStyle.control)
-                {
-                    case 'checkbox':
-                        let inputElement = '#__inputProperty' + sectStyle.style;
-                        $(document).on('click', inputElement, onCheckbox);
-                        break;
-                }
-            }
+            let inputElement = '#__inputProperty' + sectStyle.style;
+            $(document).on('click', inputElement, onCheckbox);
         });
     });
 }
@@ -527,15 +532,8 @@ function insertStyles(styles, template) {
 
     styles.forEach(s =>
     {
-        if (typeof(s) == 'string') {
-            template = template + styleTemplate.replaceAll('{name}', s);
-        } else {
-            // An object with form {style:'[style]', control:'[control]'}
-            // The default is [control]StyleTemplate to override the "input" template.
-            // TODO: If the style itself defines a 'template', then override again.
-            let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
-            template = template + overrideTemplate.replaceAll('{name}', s.style);
-        }
+        let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
+        template = template + overrideTemplate.replaceAll('{name}', s.style);
     });
 
     return template;
@@ -781,21 +779,13 @@ function populateStyleValues(el, tagName) {
             let sectionStyles = sections.filter(section => section.name == s)[0].styles;
             sectionStyles.forEach(sectStyle =>
             {
-                if (typeof(sectStyle) == 'string')
-                {
-                    let styleValue = $(el).css(sectStyle);
-                    let inputElement = '#__inputProperty' + sectStyle;
-                    $(inputElement).val(styleValue);
-                } else {
-                    let styleValue = $(el).css(sectStyle.style);
-                    let inputElement = '#__inputProperty' + sectStyle.style;
-                    $(inputElement).val(styleValue);
-                }
+                let styleValue = $(el).css(sectStyle.style);
+                let inputElement = '#__inputProperty' + sectStyle.style;
+                $(inputElement).val(styleValue);
             });
         } else {
             console.log('Section ' + s + ' is not defined.');
         }
-
     });
 }
 
