@@ -203,8 +203,12 @@ selectors in JS
         width: var(--__propertyLabelWidth);
     }
 
-    .__propertyField {
+    .__inputPropertyField {
         width: var(--__propertyFieldWidth);
+        margin-left: 5px;
+    }
+
+    .__checkboxPropertyField {
         margin-left: 5px;
     }
 
@@ -295,8 +299,8 @@ selectors in JS
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
         <div class='__propertyItem'>Element: <span class='__text-bold __elementTagName'></span></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__propertyField __propertyName'></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__propertyField __propertyId'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__inputPropertyField __propertyName'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__inputPropertyField __propertyId'></div>
         <div id='__sections'></div>
     </div>
 
@@ -305,11 +309,11 @@ selectors in JS
     </div>
 
     <div class='__hidden' id = '__styleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}' cssName='{name}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__inputPropertyField' id='__inputProperty{name}' cssName='{name}'></div>
     </div>
 
     <div class='__hidden' id = '__checkboxStyleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__propertyField' id='__inputProperty{name}' type='checkbox' cssName='{name}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__checkboxPropertyField' id='__inputProperty{name}' type='checkbox' cssName='{name}'></div>
     </div>
 </body>
 
@@ -388,11 +392,11 @@ function setupButtonBar() {
 }
 
 var sections = [
-//        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
-//        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
-//        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
-//        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
-//        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
+        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
+        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
+        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
+        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
         {name:'Flags', styles: [{style:'readonly', control:'checkbox'}]}
     ];
 
