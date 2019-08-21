@@ -24,9 +24,9 @@ selectors in JS
 <style>
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom___properties */
     :root {
-        --__propertyWidth: 250px;
+        --__propertyWidth: 260px;  /* TODO: Why is this not equal to plw + pfw? */
         --__toolbarHeight: 30px;
-        --__propertyLabelWidth: 100px;
+        --__propertyLabelWidth: 120px;
         --__propertyFieldWidth: 115px;
     }
 /*
@@ -283,7 +283,8 @@ selectors in JS
                     </table>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p __border1 __propertiesContainer'></div>
+                    <div class='__h100p __border1'>
+                        <div class='__propertiesContainer'></div>
                 </td>
             </tr>
         </table>
@@ -438,11 +439,11 @@ function setupSourcePropertiesContainer() {
         let sectionName = '__sectionName' + n;
         let contentName = '__content' + n;
         let st = sectionTemplate.replaceAll('{sectionName}', n);
-        st = st + "<div id='" + contentName + "'>";
+        st = st + "<div class='" + contentName + "'>";
         st = insertStyles(sections.filter(s => s.name == n)[0].styles, st);
         st = st + "</div>";
         sectionContent.push(st);
-        sectionNameIds.push({section: '#' + sectionName, content: '#' + contentName});
+        sectionNameIds.push({section: '#' + sectionName, content: '.' + contentName});
 
         // All section content initially visible
         sectionContentVisible['#' + contentName] = true;
@@ -588,7 +589,7 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
 
             if (map.length == 1) {
                 map = map[0];
-                
+
                 if (map.toggle) {
                     toggleTags(editor, preview, map.insert[0], map.insert[1], editorText, s1, between, s2, start, end);
                 } else {
@@ -827,6 +828,7 @@ function demo() {
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
     $('#__previewh').html(demoText);
+    showVerticalLayout();
 }
 
 // Copy from one editor to the other
