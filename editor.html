@@ -333,6 +333,8 @@ String.prototype.replaceAll = function(search, replacement) {
     return target.replace(new RegExp(search, 'g'), replacement);
 };
 
+var TAB_SPACES = 5;
+
 var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
@@ -359,8 +361,8 @@ function initialize() {
 function wireUpEvents() {
     $('#__editorh').keyup(event => editorKeyPress(event.which, '#__editorh', '#__previewh'));
     $('#__editorv').keyup(event => editorKeyPress(event.which, '#__editorv', '#__previewv'));
-    $('#__editorh').keydown(event => editorKeyDown(event));
-    $('#__editorv').keydown(event => editorKeyDown(event));
+    $('#__editorh').keydown(event => editorKeyDown(event, '#__editorh', '#__previewh'));
+    $('#__editorv').keydown(event => editorKeyDown(event, '#__editorv', '#__previewv'));
     $('.__preview').mouseover(event => previewMouseOver(event.target));
     $('.__preview').mouseleave(event => clearProperties());
     $('.__preview').click(event => previewClick(event));
@@ -645,11 +647,57 @@ function toggleTags(editor, preview, t1, t2, editorText, s1, between, s2, start,
     preview.html(newText);
 }
 
+function insertTab(editor, preview) {
+    let editorText = $(editor).val();
+    let start = $(editor)[0].selectionStart;
+    let end = $(editor)[0].selectionEnd;
+    let s1 = editorText.substring(0, start);
+    let s2 = editorText.substring(end);
+
+    // TODO: Handle replacing selection with TAB_SPACES if start != selectionEnd
+
+    let newText = s1 + ' '.repeat(TAB_SPACES) + s2;
+    $(editor).val(newText);
+    $(editor)[0].selectionStart = start + TAB_SPACES;
+    $(editor)[0].selectionEnd = start + TAB_SPACES;
+    $(preview).html(newText);
+}
+
+function removeTab(editor, preview) {
+    let start = $(editor)[0].selectionStart;
+    let end = $(editor)[0].selectionEnd;
+
+    if (start > 0 && start == end) {
+        let editorText = $(editor).val();
+
+        // wherever we are, remove up to TAB_SPACES whitespace from the left.
+        let n = 0;
+        while (n < TAB_SPACES && editorText[start - 1 - n] == ' ') ++n;
+
+        start = start - n;
+        let s1 = editorText.substring(0, start);
+        let s2 = editorText.substring(end);
+        let newText = s1 + s2;
+        $(editor).val(newText);
+        $(editor)[0].selectionStart = start;
+        $(editor)[0].selectionEnd = start;
+        $(preview).html(newText);
+    }
+}
+
 // The event wired up here creates a gazillion events as long as the ALT key
 // is pressed.  There must be a better way!
-function editorKeyDown(event) {
+function editorKeyDown(event, editor, preview) {
     altKeyDown = event.altKey;
     ctrlKeyDown = event.ctrlKey;
+
+    if (event.keyCode == 9 && !event.shiftKey) {
+        insertTab(editor, preview);
+        event.preventDefault();
+    } else if (event.keyCode == 9 && event.shiftKey) {
+        removeTab(editor, preview);
+        event.preventDefault();
+    }
 }
 
 function previewClick(event) {
