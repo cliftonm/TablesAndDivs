@@ -306,7 +306,7 @@ selectors in JS
     </div>
 
     <div class='__hidden' id = '__sectionTemplate'>
-        <div class='__propertItem __section __sectionBar' id='__sectionName{sectionName}'>{sectionName}</div>
+        <div class='__propertItem __section __sectionBar __sectionName{sectionName}'>{sectionName}</div>
     </div>
 
     <div class='__hidden' id = '__inputStyleTemplate'>
@@ -446,7 +446,7 @@ function setupSourcePropertiesContainer() {
         sectionNameIds.push({section: '#' + sectionName, content: '.' + contentName});
 
         // All section content initially visible
-        sectionContentVisible['#' + contentName] = true;
+        sectionContentVisible['.' + contentName] = true;
     });
 
     // LocalStore.put('sectionContentVisible', 1);
@@ -759,8 +759,8 @@ function showAllowableSections(tagName) {
     let allowableSections = tagSections.filter(s => s.tag == lcTagName)[0].sections;
 
     sectionNames.forEach(sn => {
-        let sectionName = '#__sectionName' + sn;
-        let contentName = '#__content' + sn;
+        let sectionName = '.__sectionName' + sn;
+        let contentName = '.__content' + sn;
         if (allowableSections.includes(sn)) {
             $(sectionName).removeClass('__hidden');
 
@@ -828,7 +828,7 @@ function demo() {
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
     $('#__previewh').html(demoText);
-    showVerticalLayout();
+    // showVerticalLayout();
 }
 
 // Copy from one editor to the other
