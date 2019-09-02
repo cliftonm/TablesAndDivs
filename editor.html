@@ -24,7 +24,7 @@ selectors in JS
 <style>
     /* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom___properties */
     :root {
-        --__propertyWidth: 260px;  /* TODO: Why is this not equal to plw + pfw? */
+        --__propertyWidth: 280px;  /* TODO: Why is this not equal to plw + pfw? */
         --__toolbarHeight: 30px;
         --__propertyLabelWidth: 120px;
         --__propertyFieldWidth: 115px;
@@ -71,6 +71,10 @@ selectors in JS
     .__border1 {
         border-style:solid;
         border-width: 1px;
+    }
+    
+    .__vscroll {
+        overflow-y:scroll;
     }
 
 /* Absolution positioning should be avoided like the plague! */
@@ -248,7 +252,7 @@ selectors in JS
                     <div class='__preview __h100p __border1' id='__previewh'></div>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p  __border1'>
+                    <div class='__h100p  __border1 __vscroll'>
                         <div class='__propertiesContainer'></div>
                     </div>
                 </td>
@@ -296,6 +300,7 @@ selectors in JS
         <button class='__showHorizontal'>Horizontal</button>
         <button class='__showVertical'>Vertical</button>
         <button class='__clearEditors'>Clear</button>
+        <button class='__save'>Save</button>
     </div>
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
@@ -388,6 +393,7 @@ function wireUpEvents() {
     $('.__showHorizontal').click(() => showHorizontalLayout());
     $('.__showVertical').click(() => showVerticalLayout());
     $('.__clearEditors').click(() => clearEditors());
+    $('.__save').click(() => save());
 
     // Handle CR
     $('.__propertyName').keypress((event) => propertyNameKeyPress(event));
@@ -463,10 +469,17 @@ function setupSourcePropertiesContainer() {
         $(document).on('click', sni.section, () => showOrHideSectionContent(sni.content));
     })
 
-    // Also wire up future property style input boxes events.
+    // Also wire up future property style input boxes and checkbox events.
     sections.forEach(section =>
     {
-        section.styles.forEach(sectStyle =>
+        section.styles.filter(s=>s.control=='input').forEach(sectStyle =>
+        {
+            let inputElement = '#__inputProperty' + sectStyle.style;
+            $(document).on('keydown', inputElement, onInputKeyPress);
+            $(document).on('blur', inputElement, onUpdateElementStyle);
+        });
+
+        section.styles.filter(s=>s.control=='checkbox').forEach(sectStyle =>
         {
             let inputElement = '#__inputProperty' + sectStyle.style;
             $(document).on('click', inputElement, onCheckbox);
@@ -479,13 +492,25 @@ function onCheckbox(event) {
     let attr = $(el).attr('cssName');
     let checked = el.is(':checked');
     $(selectedElement).prop(attr, checked);       
+    updateSource();
 }
 
 function onInputKeyPress(event) {
     if (event.keyCode == 13) {
-        updateElementStyle(event);
+        let el = $('#' + event.target.id);
+        let attr = $(el).attr('cssName');
+        let val = el.val();
+        $(selectedElement).css(attr, val);       
         updateSource();
     }
+}
+
+function onUpdateElementStyle(event) {
+    let el = $('#' + event.target.id);
+    let attr = $(el).attr('cssName');
+    let val = el.val();
+    $(selectedElement).css(attr, val);       
+    updateSource();
 }
 
 function propertyNameKeyPress(event) {
@@ -509,12 +534,14 @@ function updateSource() {
     editor.val(text);
 }
 
+/*
 function updateElementStyle(event) {
     let el = $('#' + event.target.id);
     let val = el.val();
     let attr = $(el).attr('cssName');
     $(selectedElement).css(attr, val);       
 }
+*/
 
 function updateElementName(event) {
     let el = $(event.currentTarget);
@@ -820,6 +847,26 @@ function clearEditors() {
     $('#__editorv').val('');
     $('#__previewh').html('');
     $('#__previewv').html('');
+}
+
+function save() {
+    let editor = $(currentEditor);
+    let text = editor.val();
+    download('content.html', text);
+}
+
+// https://ourcodeworld.com/articles/read/189/how-to-create-a-file-and-generate-a-download-with-javascript-in-the-browser-without-a-server
+function download(filename, text) {
+    var element = document.createElement('a');
+    element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(text));
+    element.setAttribute('download', filename);
+
+    element.style.display = 'none';
+    document.body.appendChild(element);
+
+    element.click();
+
+    document.body.removeChild(element);
 }
 
 function demo() {
