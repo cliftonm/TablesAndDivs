@@ -431,14 +431,17 @@ var tagSections = [
     {tag: 'input', sections: ['Margins', 'Padding', 'Flags']},
     {tag: 'p', sections: ['Dimensions', 'Margins', 'Padding', 'Font', 'Border']},
     {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']},
+    {tag: 'ul', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'li', sections: ['Margins', 'Padding', 'Border']},
 ];
 
 function setupSourcePropertiesContainer() {
+    console.log("setupSourcePropertiesContainer");
     let sectionNames = sections.map(s => s.name);
 
     let sectionTemplate = $('#__sectionTemplate').html();
     let sectionContent = [];
-    let sectionNameIds = [];
+    let sectionNameClasses = [];
     
     sectionNames.forEach(n =>
     {
@@ -446,10 +449,10 @@ function setupSourcePropertiesContainer() {
         let contentName = '__content' + n;
         let st = sectionTemplate.replaceAll('{sectionName}', n);
         st = st + "<div class='" + contentName + "'>";
-        st = insertStyles(sections.filter(s => s.name == n)[0].styles, st);
+        st = createTemplate(sections.filter(s => s.name == n)[0].styles, st);
         st = st + "</div>";
         sectionContent.push(st);
-        sectionNameIds.push({section: '#' + sectionName, content: '.' + contentName});
+        sectionNameClasses.push({section: '.' + sectionName, content: '.' + contentName});
 
         // All section content initially visible
         sectionContentVisible['.' + contentName] = true;
@@ -459,7 +462,7 @@ function setupSourcePropertiesContainer() {
 
     $("#__sections").html(sectionContent.join(''));
 
-    sectionNameIds.forEach(sni =>
+    sectionNameClasses.forEach(sni =>
     {
         // When clicking on the section div, show or hide the content.
         // This doesn't work:
@@ -555,12 +558,14 @@ function updateElementId(event) {
     $(selectedElement).attr('id', val);       
 }
 
-function insertStyles(styles, template) {
-    let styleTemplate = $('#__styleTemplate').html();
-
+function createTemplate(styles, template) {
     styles.forEach(s =>
     {
         let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
+
+        if (s.style == 'width') {
+            console.log('width');
+        }
         template = template + overrideTemplate.replaceAll('{name}', s.style);
     });
 
@@ -584,15 +589,19 @@ function setupPropertiesContainer() {
     $('.__propertiesContainer').html(html);
 }
 
+
 // ctrl / alt / shift / meta
 keymap = [
     {special: 'alt', key: 'C', insert: ['<code>', '</code>'] },
-    {special: 'alt', key: 'P', insert: ['<pre>', '</pre>'] },
+    {special: 'alt', key: 'P', insert: ['<p>', '</p>'] },
+    {special: 'alt', key: 'U', insert: ['<ul>', '</ul>'] },
+    {special: 'alt', key: 'L', insert: ['<li>', '</li>'] },
     {special: 'alt', key: 'B', insert: ['<b>', '</b>'], toggle: true },
     {special: 'alt', key: 'I', insert: ['<i>', '</i>'], toggle: true },
     {special: 'alt', key: '1', insert: ["<pre lang='cs'>", '</pre>'] },
     {special: 'alt', key: '2', insert: ["<pre lang='jscript'>", '</pre>'] },
-    {special: 'alt', key: '3', insert: ["<pre lang='css'>", '</pre>'] },
+    {special: 'alt', key: '3', insert: ["<pre lang='html'>", '</pre>'] },
+    {special: 'alt', key: '4', insert: ["<pre lang='css'>", '</pre>'] },
 ];
 
 function editorKeyPress(event, sourceEditor, targetPreview) {
@@ -640,7 +649,7 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
 
 function insertTags(editor, preview, t1, t2, s1, between, s2, end) {
     let newText = s1 + t1 + between + t2 + s2;
-    let newIdx = end + t1.length + t2.length;
+    let newIdx = end + t1.length;
     $(editor).val(newText);                
 
     // Set cursor to end of selection.
