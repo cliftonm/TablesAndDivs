@@ -253,7 +253,7 @@ selectors in JS
                 </td>
                 <td class='__properties'>
                     <div class='__h100p  __border1 __vscroll'>
-                        <div class='__propertiesContainer'></div>
+                        <div class='__propertiesContainerh'></div>
                     </div>
                 </td>
             </tr>
@@ -288,7 +288,7 @@ selectors in JS
                 </td>
                 <td class='__properties'>
                     <div class='__h100p __border1'>
-                        <div class='__propertiesContainer'></div>
+                        <div class='__propertiesContainerv'></div>
                 </td>
             </tr>
         </table>
@@ -305,8 +305,8 @@ selectors in JS
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
         <div class='__propertyItem'>Element: <span class='__text-bold __elementTagName'></span></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__inputPropertyField __propertyName'></div>
-        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__inputPropertyField __propertyId'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>Name:</span><input class='__inputPropertyField __propertyName' id='__pname{hv}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>ID:</span><input class='__inputPropertyField __propertyId' id='__pid{hv}'></div>
         <div id='__sections'></div>
     </div>
 
@@ -315,11 +315,11 @@ selectors in JS
     </div>
 
     <div class='__hidden' id = '__inputStyleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__inputPropertyField' id='__inputProperty{name}' cssName='{name}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__inputPropertyField' id='__inputProperty{name}{hv}' cssName='{name}'></div>
     </div>
 
     <div class='__hidden' id = '__checkboxStyleTemplate'>
-        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__checkboxPropertyField' id='__inputProperty{name}' type='checkbox' cssName='{name}'></div>
+        <div class='__propertyItem'><span class='__propertyLabel'>{name}:</span><input class='__checkboxPropertyField' id='__inputProperty{name}{hv}' type='checkbox' cssName='{name}'></div>
     </div>
 </body>
 
@@ -341,6 +341,12 @@ String.prototype.replaceAll = function(search, replacement) {
 
 var TAB_SPACES = 5;
 
+// TODO: Check state (like readonly) is not being set when element is selected.
+// After switching h/v, selectedElement is not longer valid because the view changed?
+//      As in, we can't change the properties after changing h/v unless we reset the selected element.
+// id and name are not setting in the comp. h/v properties
+// id/name not being set when element is selected?
+
 var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
@@ -360,7 +366,8 @@ function initialize() {
     initializeSections();
     setupButtonBar();
     setupSourcePropertiesContainer();
-    setupPropertiesContainer();
+    setupPropertiesContainer('h');
+    setupPropertiesContainer('v');
     wireUpEvents();
     demo();
 }
@@ -478,42 +485,67 @@ function setupSourcePropertiesContainer() {
         section.styles.filter(s=>s.control=='input').forEach(sectStyle =>
         {
             let inputElement = '#__inputProperty' + sectStyle.style;
-            $(document).on('keydown', inputElement, onInputKeyPress);
-            $(document).on('blur', inputElement, onUpdateElementStyle);
+            
+            $(document).on('keydown', inputElement + 'h', onInputKeyPress);
+            $(document).on('blur', inputElement + 'h', onUpdateElementStyle);
+
+            $(document).on('keydown', inputElement + 'v', onInputKeyPress);
+            $(document).on('blur', inputElement + 'v', onUpdateElementStyle);
         });
 
         section.styles.filter(s=>s.control=='checkbox').forEach(sectStyle =>
         {
             let inputElement = '#__inputProperty' + sectStyle.style;
-            $(document).on('click', inputElement, onCheckbox);
+            $(document).on('click', inputElement + 'h', onCheckbox);
+            $(document).on('click', inputElement + 'v', onCheckbox);
         });
     });
 }
 
 function onCheckbox(event) {
-    let el = $('#' + event.currentTarget.id);
+    let elName = '#' + event.currentTarget.id;
+    let el = $(elName);
     let attr = $(el).attr('cssName');
     let checked = el.is(':checked');
     $(selectedElement).prop(attr, checked);       
     updateSource();
+
+    // like updateOtherPropertyGrid
+    let hv = elName[elName.length - 1];
+    let althv = hv == 'h' ? 'v' : 'h';
+    let elx = elName.slice(0, -1) + althv;
+    $(elx).prop('checked', checked);       
 }
 
 function onInputKeyPress(event) {
     if (event.keyCode == 13) {
-        let el = $('#' + event.target.id);
+        let elName = '#' + event.target.id;
+        let el = $(elName);
         let attr = $(el).attr('cssName');
         let val = el.val();
         $(selectedElement).css(attr, val);       
         updateSource();
+        updateOtherPropertyGrid(elName, val);
     }
 }
 
 function onUpdateElementStyle(event) {
-    let el = $('#' + event.target.id);
+    let elName = '#' + event.target.id;
+    let el = $(elName);
     let attr = $(el).attr('cssName');
     let val = el.val();
     $(selectedElement).css(attr, val);       
     updateSource();
+    updateOtherPropertyGrid(elName, val);
+}
+
+function updateOtherPropertyGrid(elName, val) {
+    // We also need to update the complimentary input in the other properties section
+    // Remove the trailing h or v.
+    let hv = elName[elName.length - 1];
+    let althv = hv == 'h' ? 'v' : 'h';
+    let elx = elName.slice(0, -1) + althv;
+    $(elx).val(val);
 }
 
 function propertyNameKeyPress(event) {
@@ -549,23 +581,22 @@ function updateElementStyle(event) {
 function updateElementName(event) {
     let el = $(event.currentTarget);
     let val = el.val();
-    $(selectedElement).attr('name', val);       
+    $(selectedElement).attr('name', val);      
+    debugger; 
+    updateOtherPropertyGrid(event.currentTarget.id, val);
 }
 
 function updateElementId(event) {
     let el = $(event.currentTarget);
     let val = el.val();
     $(selectedElement).attr('id', val);       
+    updateOtherPropertyGrid(event.currentTarget.id, val);
 }
 
 function createTemplate(styles, template) {
     styles.forEach(s =>
     {
         let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
-
-        if (s.style == 'width') {
-            console.log('width');
-        }
         template = template + overrideTemplate.replaceAll('{name}', s.style);
     });
 
@@ -584,9 +615,12 @@ function showOrHideSectionContent(id) {
     // LocalStore.put('sectionContentVisible', sectionContentVisible);
 }
 
-function setupPropertiesContainer() {
+function setupPropertiesContainer(hv) {
     let html = $('#__sourcePropertiesContainer').html();
-    $('.__propertiesContainer').html(html);
+    // Resolve the final dynamic ID with h or v to distinguish which property
+    // is being changed.
+    html = html.replaceAll('{hv}', hv);
+    $('.__propertiesContainer' + hv).html(html);
 }
 
 
@@ -827,7 +861,8 @@ function populateStyleValues(el, tagName) {
             {
                 let styleValue = $(el).css(sectStyle.style);
                 let inputElement = '#__inputProperty' + sectStyle.style;
-                $(inputElement).val(styleValue);
+                $(inputElement + 'h').val(styleValue);
+                $(inputElement + 'v').val(styleValue);
             });
         } else {
             console.log('Section ' + s + ' is not defined.');

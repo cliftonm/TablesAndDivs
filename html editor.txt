@@ -1,0 +1,24 @@
+<h2>Introduction</h2>
+<p>I've been curious about writing an HTML editor with preview and a property pane for a while, and after writing the article in Tables and Divs, it seemed like a natural progression to put that article to use doing something real, so here we are.</p>
+<p>The "talking points" of this article are:</p>
+<p><ul>
+<li>Creating an editor with both horizontal and vertical layout of the editor, preview, and properties sections.</li>
+<li>Updating the preview as changes are made in the editor.</li>
+<li></li>
+</ul>
+And to make life interesting, this entire article is written using this very HTML editor!
+</p>
+
+dynamic HTML
+
+CSS - styles (container and specific attributes), selectors
+
+Both for writing articles and playground for designing a layout
+
+Many todo things:
+
+Autocompletion
+Colorization
+Ability to use third party libraries
+
+
