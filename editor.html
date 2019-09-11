@@ -253,7 +253,7 @@ selectors in JS
                 </td>
                 <td class='__properties'>
                     <div class='__h100p  __border1 __vscroll'>
-                        <div class='__propertiesContainerh'></div>
+                        <div class='__bothPropertiesContainer __propertiesContainerh'></div>
                     </div>
                 </td>
             </tr>
@@ -288,7 +288,7 @@ selectors in JS
                 </td>
                 <td class='__properties'>
                     <div class='__h100p __border1'>
-                        <div class='__propertiesContainerv'></div>
+                        <div class='__bothPropertiesContainer __propertiesContainerv'></div>
                 </td>
             </tr>
         </table>
@@ -341,11 +341,8 @@ String.prototype.replaceAll = function(search, replacement) {
 
 var TAB_SPACES = 5;
 
-// TODO: Check state (like readonly) is not being set when element is selected.
 // After switching h/v, selectedElement is not longer valid because the view changed?
 //      As in, we can't change the properties after changing h/v unless we reset the selected element.
-// id and name are not setting in the comp. h/v properties
-// id/name not being set when element is selected?
 
 var altKeyDown = false;
 var ctrlKeyDown = false;
@@ -582,15 +579,14 @@ function updateElementName(event) {
     let el = $(event.currentTarget);
     let val = el.val();
     $(selectedElement).attr('name', val);      
-    debugger; 
-    updateOtherPropertyGrid(event.currentTarget.id, val);
+    updateOtherPropertyGrid('#' + event.currentTarget.id, val);
 }
 
 function updateElementId(event) {
     let el = $(event.currentTarget);
     let val = el.val();
     $(selectedElement).attr('id', val);       
-    updateOtherPropertyGrid(event.currentTarget.id, val);
+    updateOtherPropertyGrid('#' + event.currentTarget.id, val);
 }
 
 function createTemplate(styles, template) {
@@ -808,7 +804,7 @@ function previewMouseOver(element) {
 function showProperties(element) {
     let tagName = element.tagName;
     $('.__elementTagName').text(tagName);
-    $('.__propertiesContainer').removeClass('__hidden');
+    $('.__bothPropertiesContainer').removeClass('__hidden');
     $('.__propertyName').val($(element).attr('name'));
     $('.__propertyId').val($(element).attr('id'));
     showAllowableSections(tagName);
@@ -816,9 +812,10 @@ function showProperties(element) {
 }
 
 function clearProperties() {
+    debugger;
     if (!selectedElement) {
         $('.__elementTagName').text('');
-        $('.__propertiesContainer').addClass('__hidden');
+        $('.__bothPropertiesContainer').addClass('__hidden');
         hoverElement = undefined;
     }
 }
@@ -857,12 +854,21 @@ function populateStyleValues(el, tagName) {
     {
         if (sections.filter(section => section.name == s).length > 0) {
             let sectionStyles = sections.filter(section => section.name == s)[0].styles;
+
             sectionStyles.forEach(sectStyle =>
             {
-                let styleValue = $(el).css(sectStyle.style);
                 let inputElement = '#__inputProperty' + sectStyle.style;
-                $(inputElement + 'h').val(styleValue);
-                $(inputElement + 'v').val(styleValue);
+
+                if (sectStyle.control == 'checkbox') {
+                    let attr = sectStyle.style;
+                    let checked = $(el).prop(attr);
+                    $(inputElement + 'h').prop('checked', checked);       
+                    $(inputElement + 'v').prop('checked', checked);       
+                } else {
+                    let styleValue = $(el).css(sectStyle.style);
+                    $(inputElement + 'h').val(styleValue);
+                    $(inputElement + 'v').val(styleValue);
+                }
             });
         } else {
             console.log('Section ' + s + ' is not defined.');
