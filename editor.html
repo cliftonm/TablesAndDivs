@@ -119,20 +119,22 @@ selectors in JS
     }
 
     .__taeditorh {
-        height: calc(100% - var(--__toolbarHeight));
-        width: 100%;
+        /* compensate for padding so we can see the cursor on the left margin */
+        height: calc(100% - 4px);
+        width: calc(100% - 4px); 
         resize: none;
-        padding: 0;
+        padding: 1;
         margin: 0;
         white-space:normal;   /* or auto? */
         overflow: auto;
     }
 
     .__taeditorv {
-        height: 100%;
-        width: 100%;
+        /* compensate for padding so we can see the cursor on the left margin */
+        height: calc(100% - 4px);
+        width: calc(100% - 4px); 
         resize: none;
-        padding: 0;
+        padding: 1;
         margin: 0;
         white-space:normal;   /* or auto? */
         overflow: auto;
@@ -323,7 +325,7 @@ selectors in JS
     </div>
 </body>
 
-<script>
+<script> 
 class LocalStore {
     static put(name, value) {
         window.localStorage.setItem(name, value);
@@ -624,6 +626,8 @@ function setupPropertiesContainer(hv) {
 keymap = [
     {special: 'alt', key: 'C', insert: ['<code>', '</code>'] },
     {special: 'alt', key: 'P', insert: ['<p>', '</p>'] },
+    {special: 'alt', key: 'R', insert: ['<p>&nbsp;', '</p>'], eoi: true}, // cursor at end of insert 
+    {special: 'alt', key: 'O', insert: ['<ol>', '</ol>'] },
     {special: 'alt', key: 'U', insert: ['<ul>', '</ul>'] },
     {special: 'alt', key: 'L', insert: ['<li>', '</li>'] },
     {special: 'alt', key: 'B', insert: ['<b>', '</b>'], toggle: true },
@@ -659,7 +663,7 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
                 if (map.toggle) {
                     toggleTags(editor, preview, map.insert[0], map.insert[1], editorText, s1, between, s2, start, end);
                 } else {
-                    insertTags(editor, preview, map.insert[0], map.insert[1], s1, between, s2, end);
+                    insertTags(editor, preview, map.insert[0], map.insert[1], s1, between, s2, end, map.eoi);
                 }
 
                 event.preventDefault();
@@ -677,14 +681,19 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
     }
 }
 
-function insertTags(editor, preview, t1, t2, s1, between, s2, end) {
+function insertTags(editor, preview, t1, t2, s1, between, s2, end, eoiFlag) {
     let newText = s1 + t1 + between + t2 + s2;
     let newIdx = end + t1.length;
     $(editor).val(newText);                
 
-    // Set cursor to end of selection.
-    editor[0].selectionStart = newIdx;
-    editor[0].selectionEnd = newIdx;
+    if (eoiFlag) {
+        editor[0].selectionStart = newIdx + t2.length;
+        editor[0].selectionEnd = newIdx + t2.length;
+    } else {
+        // Set cursor between the tags and at the end of the selected (if any) text.
+        editor[0].selectionStart = newIdx;
+        editor[0].selectionEnd = newIdx;
+    }
 
     preview.html(newText);
 }
@@ -919,7 +928,7 @@ function download(filename, text) {
 }
 
 function demo() {
-    let demoText="<style>\np {\n\n  margin: 0px 0px 0px 5px;\n}\n</style>\n<p id='hi'>Hello World!</p><div id='div'>DIV Content</div><input value='An Input'></input>";
+    let demoText="<style>\np {\n  margin: 0px 0px 0px 5px;\n}\n.mydiv {\n  background-color: red;\n  margin: 5px;\n</style>\n<p id='hi'>Hello World!</p><div class='mydiv' id='div'>DIV Content</div><input value='An Input'></input>";
     $('#__editorv').val(demoText);
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
