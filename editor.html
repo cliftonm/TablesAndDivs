@@ -812,7 +812,6 @@ function showProperties(element) {
 }
 
 function clearProperties() {
-    debugger;
     if (!selectedElement) {
         $('.__elementTagName').text('');
         $('.__bothPropertiesContainer').addClass('__hidden');
@@ -933,9 +932,29 @@ function copy(esource, etarget) {
     let edSource = '#__editor' + esource;
     let edTarget = '#__editor' + etarget;
     let pTarget = '#__preview' + etarget;
+
+    if (selectedElement) {
+        // Retain the current selection by marking it with a special attribute and then resetting it to that element after updating the HTML.
+        $(selectedElement).attr('__hv__', 42);
+        updateSource();
+    }
+
     let editorText = $(edSource).val();
     $(edTarget).val(editorText);
     $(pTarget).html(editorText);
+
+    if (selectedElement)
+    {
+        // Then remove the element.  Note that it exists in two places now, the source HTML and the target HTML.
+        // selectedElement is still pointing to the source element.
+        $(selectedElement).removeAttr('__hv__');
+
+        // Find the same element in the target HTML.  This is now the new selected element.
+        selectedElement = $("[__hv__ = '42']")[0];
+
+        // And remove all occurrances, to be safe.
+        $("[__hv__ = '42']").removeAttr('__hv__');
+    }
 }
 
 </script>
