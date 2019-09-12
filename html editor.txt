@@ -1,24 +1,73 @@
+<style>
+     .foo {background-color: #ddd;}
+</style>
+<body>
 <h2>Introduction</h2>
-<p>I've been curious about writing an HTML editor with preview and a property pane for a while, and after writing the article in Tables and Divs, it seemed like a natural progression to put that article to use doing something real, so here we are.</p>
-<p>The "talking points" of this article are:</p>
+<p>I've been interested about writing an HTML editor with some specific features, namely a preview window as well as a property pane to view/manipulate attributes and properties of the various elements.  After writing the article <a href="https://www.codeproject.com/Articles/5164453/Fun-Exploring-Div-and-Table-Layout">Fun Exploring Div and Table Layout</a>, it seemed like a natural progression to put that article to use doing something real, so here we are.</p>
+<p>&nbsp;</p>
+<p>The main talking points and interesting tricks employed here are:</p>
 <p><ul>
 <li>Creating an editor with both horizontal and vertical layout of the editor, preview, and properties sections.</li>
 <li>Updating the preview as changes are made in the editor.</li>
-<li></li>
+<li>Synchronize the property values between the two editor "views."</li>
+<li>Provide both "hover over element" and "select and lock element" into the property pane.</li>
+<li>When the user changes the layout (horizontal/vertical), track the currently selected element.</li>
+<li>Shortcuts for some commonly used markup, as I'm writing this entire article is written using this very HTML editor!</li>
+<li>Configurable attributes/properties defined in metadata.</li>
+<li>Dynamic HTML for generating the property sections.</li>
+<li>Search and replace.</li>
 </ul>
-And to make life interesting, this entire article is written using this very HTML editor!
 </p>
 
-dynamic HTML
+<h3>Fun Things on the TODO List</h3>
+<p>These are things I'd like to continue to explore but sort of break the "bare bones" editor concept presented here as things like token colorization will require a real editor, not just the <code>textarea</code> element used here.</p>
+<ul>
+<li>A real menu bar.</li>
+<li>Auto-completion of element tags.</li>
+<li>Colorization</li>
+<li>Adjustable widths/heights of the three panes -- editor, preview, properties.</li>
+<li>More advanced keyboard shortcuts.  <a href="https://craig.is/killing/mice">Mousetrap</a> looks like a good library to use for this.</li>
+<li>Save and the missing load suck.  I don't like that save puts the file into the downloads area.</li>
+<li>Views as objects (see section on "HTML is Not Objects" below.)</li>
+</ul>
 
-CSS - styles (container and specific attributes), selectors
+<h3>A Word About CSS</h3>
+In discussions on Code Project and in writing this, I've come to realize that there are different uses of CSS:
 
-Both for writing articles and playground for designing a layout
+<ol>
+<li>Defining multiple attributes of an element that can be considered a reusable element, particularly in that it often has child elements.</li>
+<li>Defining a specific style that customizes just that elements</li>
+<li>Defining a tag as a class or id that is used for manipulating the element.</li>
+<li>Visual (as opposed to layout) styles such as color and font size.</li>
+<li>Animations</li>
+<li>Other?</li>
+</ol>
 
-Many todo things:
+<p>Of particular importance is the idea that you <b>never, ever</b>, want to use a tag (typically a class) for both layout styling and selection.  Even if this seems like a perfectly reasonable thing to do when you're starting to develop the page, it can become a nightmare when you need to customize the layout and suddenly you need two different class tags but the behavior for manipulating the element is tied to class tag that describes the layout.</p>
 
-Autocompletion
-Colorization
-Ability to use third party libraries
+<h3>Cascading Styles</h3>
+<p>OK, I despise cascading styles for the simple reason that if you change the structure of the markup, it invalidates the cascading structure of the CSS.  I much prefer flat CSS in which (typically) the class tag describes what is applied for that element in the HTML structure.</p>
+
+<h3>Keyboard Shortcuts</h3>
+<p>In this editor I'm mapping a several keyboard shortcuts using the <code>ALT</code> key.  Certain extensions in Chrome (and I suppose other browsers) may trigger instead.  At least in Chrome, you can go to <a href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> and change the keyboard mappings (or disable them) if you find they interfere with the shortcuts in this editor.  Even using  <code>event.preventDefault()</code> doesn't stop an extension with a shortcut from taking over!</p>
+
+<h3>Bugs</h3>
+<p>I've noticed a couple odd things on occasion:
+<ul><li>The "wrap selected text with markup" sometimes doesn't pick the entire selected text.  No idea why.</li><li>The preview editor doesn't automatically scroll to the where you are editing text in the editor. 
+ This is a particularly annoying problem to figure out how to track where the user is in the editor and position the vertical scrollbar so the user can see the preview as well.  The only way that I can think of to fix this is to figure out the current element that wraps where the user is typing and use <code>scrollIntoView()</code>.  This seems complicated as a custom tag will have to be created to identify the element and then removed.  I already employ this trick when switching between horizontal and vertical layouts when an element is selected.</li>
+<li>I use a double space when starting a new sentence, something I learned in school ages ago.  The editor needs to replace additional spaces with <code>&amp;nbsp;</code> otherwise it renders as a single space.</li>
+<li>The preview doesn't update after you paste something into the editor.  You have to press a key, like one of the cursor keys, to see what you pasted.  Just haven't gotten around to fixing that.</li>
+</ul></p>
+<h3>HTML is Not "Objects"</h3>
+<p>If I were writing this as a WinForm app, I could easily assign the <code>TextBox</code> to the "other" layout panel as a child control, and all the text, selections, events, etc., would just move over.  HTML is not like that.  In the layout of this editor you'll see that I've duplicated the editor, preview, and property "controls" but this means that they require separate event handlers and proper updating when the user switches between v/h layouts.  It's annoying and could be worked around with a mechanism that would treat the HTML sections as true objects.  This was too complicated to implement at this point.</p>
+<p>&nbsp;</p>
+<h3>Noteworthy</h3>
+<p>I wrote this editor entirely in VisualStudio Code using the <a href="https://marketplace.visualstudio.com/items?itemName=daiyy.quick-html-previewer">Quick HTML Previewer</a>, which handles the HTML, CSS, and even Javascript, even importing jQuery.  Debugging I did in Chrome, but it's impressive what Quick HTML Previewer will do!</p><p>&nbsp;</p>
+<p>Also of note is that, yes, I'm using jQuery.  It's just so much easier to use, especially when manipulating multiple elements of the same class tag.</p>
 
 
+
+
+
+
+</body>
