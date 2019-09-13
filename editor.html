@@ -767,21 +767,42 @@ function removeTab(editor, preview) {
     }
 }
 
+// Returns true if the text contains a final open tag but not the closing tag.
+// Open tag can be of the form "<tag>" or "<tag " (note space)
+function inTag(s, tag) {
+    debugger;
+    let tagOpen = '<' + tag + '>';
+    let tagAltOpen = '<' + tag + ' ';
+    let tagClose = '</' + tag + '>';
+    let idxOpen = s.lastIndexOf(tagOpen);
+    let idxAltOpen = s.lastIndexOf(tagAltOpen);
+    let idxClose = s.lastIndexOf(tagClose);
+
+    return idxOpen > idxClose || idxAltOpen > idxClose;
+}
+
 function onPaste(event, editor, preview) {
     let ret = true;
     let clippy = event.originalEvent.clipboardData;
     let textItems = Object.filter(clippy.items, item => item.kind == 'string' && item.type == 'text/plain');
 
     if (Object.getOwnPropertyNames(textItems).length == 1) {
-        // Now we have to check if we're inside a <code> or <pre> block, as these
-        // need to be encoded so that < becomes &lt; etc
-        let text = clippy.getData('text/plain');
-        text = $(editor).html(text).html();            
-        let editorText = $(editor).val();
         let start = $(editor)[0].selectionStart;
         let end = $(editor)[0].selectionEnd;
+        let editorText = $(editor).val();
         let s1 = editorText.substring(0, start);
         let s2 = editorText.substring(end);
+        let text = clippy.getData('text/plain');
+
+        // Now we have to check if we're inside a <code> or <pre> block, as these
+        // need to be encoded so that < becomes &lt; etc.  Otherwise we assume the user
+        // is pasting a real HTML element.  Note that we don't check for closing </code> or </pre> tags to the right
+        // of the current position, as the user may not have created these yet. 
+
+        if (inTag(s1, 'pre') || inTag(s1, 'code')) {
+            text = $(editor).html(text).html();            
+        }
+
         let newText = s1 + text + s2;
         $(editor).val(newText);
         let curPos = s1.length + text.length;
