@@ -1,10 +1,9 @@
 <style>
-     .foo {background-color: #ddd;}
+     .foo {background-color: green;}
 </style>
 <body>
 <h2>Introduction</h2>
 <p>I've been interested about writing an HTML editor with some specific features, namely a preview window as well as a property pane to view/manipulate attributes and properties of the various elements.  After writing the article <a href="https://www.codeproject.com/Articles/5164453/Fun-Exploring-Div-and-Table-Layout">Fun Exploring Div and Table Layout</a>, it seemed like a natural progression to put that article to use doing something real, so here we are.</p>
-<p>&nbsp;</p>
 <p>The main talking points and interesting tricks employed here are:</p>
 <p><ul>
 <li>Creating an editor with both horizontal and vertical layout of the editor, preview, and properties sections.</li>
@@ -15,7 +14,7 @@
 <li>Shortcuts for some commonly used markup, as I'm writing this entire article is written using this very HTML editor!</li>
 <li>Configurable attributes/properties defined in metadata.</li>
 <li>Dynamic HTML for generating the property sections.</li>
-<li>Search and replace.</li>
+<li>Resetting the CSSOM so styles in the preview reflect changes in the <code>&lt;style&gt;</code> section in editor.</li>
 </ul>
 </p>
 
@@ -29,7 +28,7 @@
 <li>More advanced keyboard shortcuts.  <a href="https://craig.is/killing/mice">Mousetrap</a> looks like a good library to use for this.</li>
 <li>Save and the missing load suck.  I don't like that save puts the file into the downloads area.</li>
 <li>Views as objects (see section on "HTML is Not Objects" below.)</li>
-</ul>
+<li>Search and replace.</li></ul>
 
 <h3>A Word About CSS</h3>
 In discussions on Code Project and in writing this, I've come to realize that there are different uses of CSS:
@@ -64,7 +63,32 @@ In discussions on Code Project and in writing this, I've come to realize that th
 <h3>Noteworthy</h3>
 <p>I wrote this editor entirely in VisualStudio Code using the <a href="https://marketplace.visualstudio.com/items?itemName=daiyy.quick-html-previewer">Quick HTML Previewer</a>, which handles the HTML, CSS, and even Javascript, even importing jQuery.  Debugging I did in Chrome, but it's impressive what Quick HTML Previewer will do!</p><p>&nbsp;</p>
 <p>Also of note is that, yes, I'm using jQuery.  It's just so much easier to use, especially when manipulating multiple elements of the same class tag.</p>
+<h3>Screenshots</h3>
+<p>Horizontal Layout:</p>
+<img src='editor2.png'/>
+<p>&nbsp;</p>
+<p>Vertical Layout:</p>
+<img src='editor1.png'/>
+<h2>Code Dive</h2>
+So let's look under the hood.
+<h3>HTML Layout</h3>
+<p>First thing to take a look at is the layout of the HTML.  The horizontal (side-by-side) structure looks like this:</p>
+<pre lang='html'>
+</pre>
 
+<p></p>
+Wiring up Events
+Initialization
+Property Grid and more events
+Dynamic Rending
+Event Handlers
+Misc. Functions
+Tricks
+
+
+
+
+<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
 
 
 

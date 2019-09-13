@@ -270,7 +270,7 @@
                     </table>
                 </td>
                 <td class='__properties'>
-                    <div class='__h100p __border1'>
+                    <div class='__h100p __border1 __vscroll'>
                         <div class='__bothPropertiesContainer __propertiesContainerv'></div>
                 </td>
             </tr>
@@ -321,6 +321,11 @@ String.prototype.replaceAll = function(search, replacement) {
     var target = this;
     return target.replace(new RegExp(search, 'g'), replacement);
 };
+
+Object.filter = (obj, predicate) => 
+    Object.keys(obj)
+          .filter( key => predicate(obj[key]) )
+          .reduce( (res, key) => (res[key] = obj[key], res), {} );
 
 var TAB_SPACES = 5;
 
@@ -374,6 +379,8 @@ function wireUpEvents() {
     $('#__editorv').keyup(event => editorKeyPress(event, '#__editorv', '#__previewv'));
     $('#__editorh').keydown(event => editorKeyDown(event, '#__editorh', '#__previewh'));
     $('#__editorv').keydown(event => editorKeyDown(event, '#__editorv', '#__previewv'));
+    $('#__editorh').on('paste', event => onPaste(event, '#__editorh', '#__previewh'));
+    $('#__editorv').on('paste', event => onPaste(event, '#__editorv', '#__previewv'));
     $('.__preview').mouseover(event => previewMouseOver(event.target));
     $('.__preview').mouseleave(event => clearProperties());
     $('.__preview').click(event => previewClick(event));
@@ -658,7 +665,18 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
         }
         */
     } else {
+        clearStyles();
         preview.html(editorText);
+    }
+}
+
+// FM: We have to clear the CSS rules of the last style sheet so that the preview
+// is responsive to changes in the <style> section of the editor.
+function clearStyles() {
+    let i = document.styleSheets.length;
+    let ss = document.styleSheets[i - 1];
+    while (ss.rules.length > 0) {
+        ss.deleteRule(0);
     }
 }
 
@@ -747,6 +765,33 @@ function removeTab(editor, preview) {
         $(editor)[0].selectionEnd = start;
         $(preview).html(newText);
     }
+}
+
+function onPaste(event, editor, preview) {
+    let ret = true;
+    let clippy = event.originalEvent.clipboardData;
+    let textItems = Object.filter(clippy.items, item => item.kind == 'string' && item.type == 'text/plain');
+
+    if (Object.getOwnPropertyNames(textItems).length == 1) {
+        // Now we have to check if we're inside a <code> or <pre> block, as these
+        // need to be encoded so that < becomes &lt; etc
+        let text = clippy.getData('text/plain');
+        text = $(editor).html(text).html();            
+        let editorText = $(editor).val();
+        let start = $(editor)[0].selectionStart;
+        let end = $(editor)[0].selectionEnd;
+        let s1 = editorText.substring(0, start);
+        let s2 = editorText.substring(end);
+        let newText = s1 + text + s2;
+        $(editor).val(newText);
+        let curPos = s1.length + text.length;
+        $(editor)[0].selectionStart = curPos;
+        $(editor)[0].selectionEnd = curPos;
+        $(preview).html(newText);
+        ret = false;
+    }
+
+    return ret;
 }
 
 // The event wired up here creates a gazillion events as long as the ALT key
