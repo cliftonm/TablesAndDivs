@@ -69,18 +69,441 @@ In discussions on Code Project and in writing this, I've come to realize that th
 <p>&nbsp;</p>
 <p>Vertical Layout:</p>
 <img src='editor1.png'/>
-<h2>Code Dive</h2>
+<h2>Code Dive - The Basic Structure</h2>
 So let's look under the hood.
 <h3>HTML Layout</h3>
 <p>First thing to take a look at is the layout of the HTML.  The horizontal (side-by-side) structure looks like this:</p>
 <pre lang='html'>
+&lt;div class='__fullscreen __hidden' id='__horizontalView'&gt;    
+    &lt;div class='__parent __toolbar'&gt;
+        &lt;div class="__child-middle-left __buttonBar"&gt;&lt;/div&gt;
+    &lt;/div&gt;
+    &lt;table class='__noborders __fixed __fill'&gt;
+        &lt;tr&gt;
+            &lt;td class='__editorhw'&gt;
+                &lt;div class='__h100p __border1'&gt;
+                    &lt;textarea class='__taeditorh' id='__editorh'&gt;&lt;/textarea&gt;
+                &lt;/div&gt;
+            &lt;/td&gt;
+            &lt;td class='__mw1px'&gt;
+                &lt;div class='__preview __h100p __border1' id='__previewh'&gt;&lt;/div&gt;
+            &lt;/td&gt;
+            &lt;td class='__properties'&gt;
+                &lt;div class='__h100p  __border1 __vscroll'&gt;
+                    &lt;div class='__bothPropertiesContainer __propertiesContainerh'&gt;&lt;/div&gt;
+                &lt;/div&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/div&gt;
 </pre>
+Contrast this with the vertical layout in which the editor and preview are top-bottom and the properties section is on the right:
+<pre lang='html'>
+&lt;div class='__fullscreen' id='__verticalView'&gt;
+    &lt;table class='__noborders __fill'&gt;
+        &lt;tr style='height:1px;'&gt;
+            &lt;div class='__parent __toolbar'&gt;
+                &lt;div class="__child-middle-left __buttonBar"&gt;&lt;/div&gt;
+            &lt;/div&gt;
+        &lt;/tr&gt;
+        &lt;tr&gt;
+            &lt;td&gt;
+                &lt;table class='__noborders __fill'&gt;
+                    &lt;tr&gt;
+                        &lt;td&gt;
+                            &lt;div class='__h100p __border1'&gt;
+                                &lt;textarea class='__taeditorv' id='__editorv'&gt;&lt;/textarea&gt;
+                            &lt;/div&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                    &lt;tr&gt;
+                        &lt;td class='__mw1px'&gt;
+                            &lt;div class='__preview __border1 __h100p' id='__previewv'&gt;&lt;/div&gt;
+                        &lt;/td&gt;
+                    &lt;/tr&gt;
+                &lt;/table&gt;
+            &lt;/td&gt;
+            &lt;td class='__properties'&gt;
+                &lt;div class='__h100p __border1 __vscroll'&gt;
+                    &lt;div class='__bothPropertiesContainer __propertiesContainerv'&gt;&lt;/div&gt;
+            &lt;/td&gt;
+        &lt;/tr&gt;
+    &lt;/table&gt;
+&lt;/div&gt;    
+</pre>
+<p>Not much different, is it?  Some things of note:
+<ul>
+<li>All class and id tags are prefixed with <code>__</code>.  Why?  Because I don't want the tags used in the editor to conflict with the tags that the user might create for their own markup.  Technically I should also prefix the functions with <code>__</code> as well, but at some point I plan on wrapping them in <code>class</code> containers, so the point of doing that becomes somewhat moot.</li>
+<li>Note that we have two editors, previews, and property containers, distinguished by the suffix <code>h</code> and <code>v</code>.  The naming convention here is very intentional as their are functions that rely on these specific suffixes.</li>
+<li>Note that some of the class tags are layout while other class tags are for selecting the element.</li>
+</ul>
+</p>
+<h3>Templates</h3>
+<p>There are various templates used to populate the views with dynamic data as well as to duplicate common features, that being the toolbar at the top.</p>
+<h4>The Toolbar Template</h4>
+<pre lang='html'>
+&lt;div class='__hidden' id='__sourceButtonBar'&gt;
+    &lt;button class='__showHorizontal'&gt;Horizontal&lt;/button&gt;
+    &lt;button class='__showVertical'&gt;Vertical&lt;/button&gt;
+    &lt;button class='__clearEditors'&gt;Clear&lt;/button&gt;
+    &lt;button class='__save'&gt;Save&lt;/button&gt;
+&lt;/div&gt;
+</pre>
+<p>This template is simply copied into the horizontal and vertical views. </p>
+<h4>The Element Template</h4>
+<pre lang='html'>
+&lt;div class='__hidden' id = '__sourcePropertiesContainer'&gt;
+    &lt;div class='__propertyItem'&gt;Element: &lt;span class='__text-bold __elementTagName'&gt;&lt;/span&gt;&lt;/div&gt;
+    &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;Name:&lt;/span&gt;&lt;input class='__inputPropertyField __propertyName' id='__pname{hv}'&gt;&lt;/div&gt;
+    &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;ID:&lt;/span&gt;&lt;input class='__inputPropertyField __propertyId' id='__pid{hv}'&gt;&lt;/div&gt;
+    &lt;div id='__sections'&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>This template is used in the properties container at the very top and is responsible for rendering the selected element and it's <code>ID</code> and <code>name</code>.  For example, given this markup (coded directly into the editor):</p>
+<p id='myParagraph' name='fizbin'>This is a demo paragraph.</p>
+<p>We see in the properties container:</p>
+<p><img src = 'editor3.png'/></p>
+The markup for the above paragraph looks like this:
+<pre lang='html'>&lt;p id='myParagraph' name='fizbin'&gt;This is a demo paragraph.&lt;/p&gt;</pre>
+<h4>The Property Section Template</h4>
+<p>Properties are organized into sections with a header.  These are dynamically created from the metadata using this template:</p>
+<pre lang='html'>
+&lt;div class='__hidden' id = '__sectionTemplate'&gt;
+    &lt;div class='__propertItem __section __sectionBar __sectionName{sectionName}'&gt;{sectionName}&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>Notice the use of the field <code>{sectionName}</code> which gets replaced with the actual section name when the properties container is generated.</p>
+<h4>Input Style Template</h4>
+<p>Most style properties are simply an input box using this template as the basis for generating the label and input element:</p>
+<pre lang='html'>
+&lt;div class='__hidden' id = '__inputStyleTemplate'&gt;
+    &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;{name}:&lt;/span&gt;&lt;input class='__inputPropertyField' id='__inputProperty{name}{hv}' cssName='{name}'&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<p>Notice the use of the fields <code>{name}</code> and <code>{hv}</code> which are used to identify and ID the specific property style name and whether it belongs in the horizontal or vertical view.</p>
+<h4>Checkbox Style Template</h4>
+<p>Some style properties technically don't have values -- their existence determines the state of the element.  For these, there is a checkbox template:</p>
+<pre lang='html'>
+&lt;div class='__hidden' id = '__checkboxStyleTemplate'&gt;
+    &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;{name}:&lt;/span&gt;&lt;input class='__checkboxPropertyField' id='__inputProperty{name}{hv}' type='checkbox' cssName='{name}'&gt;&lt;/div&gt;
+&lt;/div&gt;
+</pre>
+<h3>Metadata</h3>
+<p>The metadata determines the property sections and the specific style properties that go in each section.  The metadata also determines what sections should be displayed for a specific element.  Please note that these definitions <b>are not comprehensive</b>.  Add to them as your needs require.  First, the sections and their styles:</p>
+<pre lang='jscript'>
+var sections = [
+        {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+        {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
+        {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
+        {name:'Font', styles: ['font-family', 'font-size', 'font-weight', 'font-style']},
+        {name:'Border', styles: ['border-style', 'border-width', 'border-color', 'border-radius']},
+        {name:'Flags', styles: [{style:'readonly', control:'checkbox'}]}
+    ];
+</pre>
+<p>Note that the <code>Flags</code> section has slightly different format that specifies the control used to render the style option.  By default the control is assumed to be an <code>input</code> element.</p>
+<p>The element tags are then map to the desired sections for that element:</p>
+<pre lang='jscript'>
+var tagSections = [
+    {tag: 'input', sections: ['Margins', 'Padding', 'Flags']},
+    {tag: 'p', sections: ['Dimensions', 'Margins', 'Padding', 'Font', 'Border']},
+    {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']},
+    {tag: 'ul', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'li', sections: ['Margins', 'Padding', 'Border']},
+];
+</pre>
+<p>Again, this is obviously not a comprehensive list!  Add to the list yourself!</p>
+<h3>Global Variables</h3>
+<p>Ugh.  Global variables.  These are used throughout the editor code and ought to be put into a static class.  I'm also going to review them at some point to see if they are all necessary.  At the moment, they are used to maintain the state of the editor.</p>
+<pre lang='jscript'>
+var altKeyDown = false;
+var ctrlKeyDown = false;
+var hoverElement = undefined;
+var selectedElement = undefined;
+var currentEditor = undefined;
+var currentPreview = undefined;
+
+// For preserving section content visibility when we click on tags.
+var sectionContentVisible = [];     
+</pre>
+<h2>Code Dive - Initialization</h2>
+<p>Now that we've covered the structural basics, let's look at the initialization process to understand how the templates and metadata are used to populate the horizontal and vertical layouts.  The core initialization routine is:</p>
+<pre lang='jscript'>
+$(document).ready(() =&gt; initialize());
+
+function initialize() {
+    initializeSections();
+    setupButtonBar();
+    setupSourcePropertiesContainer();
+    setupPropertiesContainer('h');
+    setupPropertiesContainer('v');
+    wireUpEvents();
+    showHorizontalLayout();
+    demo();
+}
+</pre>
+<h3>Section Initialization</h3>
+<p>The comments really says it all:</p>
+<pre lang='jscript'>
+// The purpose of this is to take the simpler (more human friendly) version of this:
+// {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
+// and convert the styles to an array of objects that looks like this:
+// styles: [{style:'width', control:'input'}]
+// That way we can get rid off all the horrid if-else checks when dealing with the style formatting.
+function initializeSections()
+{
+    sections.forEach(s =&gt; {
+        let i = 0;
+        for (i = 0; i &lt; s.styles.length; i++) {
+            if (typeof(s.styles[i]) == 'string') {
+                s.styles[i] = {style: s.styles[i], control: 'input'};
+            }
+        }
+    });
+}
+</pre>
+<p>I had originally written the code with a bunch of <code>if-else</code> statements based on whether the a <code>control</code> key was defined in the style list.  In my opinion, this was hideous, so I decided to "map" the styles into a common format based on whether the style itself was a <code>string</code> or an <code>object</code>, so this:</p>
+<pre lang='jscript'>styles: ['width', 'height', 'max-width', 'max-height']</pre>
+and this:
+<pre lang='jscript'>styles: [{style:'readonly', control:'checkbox'}]</pre>
+<p>get unified into the latter form, where the default control (the array of strings) is mapped into an object:</p>
+<pre lang='jscript'>{style: [stylename], control: 'input'}</pre>
+<p>This unifies all the handling of the styles in each section but makes it easier for the programmer to define the styles when the list of styles is simply an array of strings.</p>
+<h3>Setup the Button Bar</h3>
+<p>Very simple -- just copy the button bar template into the horizontal and vertical views:</p>
+<pre lang='jscript'>
+function setupButtonBar() {
+    let html = $('#__sourceButtonBar').html();
+    $('.__buttonBar').html(html);
+}
+</pre>
+<p>The joys if jQuery -- the template HTML is copied into each instance of the element with the class name <code>__buttonBar</code>.</p>
+<h3>Setup The Properties Container</h3>
+<p>The properties container is actually a template which is populated with the sections and section style "input" controls, which is then copied into the horizontal and vertical views.</p>
+<pre lang='jscript'>
+function setupSourcePropertiesContainer() {
+    let sectionNames = sections.map(s =&gt; s.name);
+
+    let sectionTemplate = $('#__sectionTemplate').html();
+    let sectionContent = [];
+    let sectionNameClasses = [];
+    
+    sectionNames.forEach(n =&gt;
+    {
+        let sectionName = '__sectionName' + n;
+        let contentName = '__content' + n;
+        let st = sectionTemplate.replaceAll('{sectionName}', n);
+        st = st + "&lt;div class='" + contentName + "'&gt;";
+        st = createSectionStyleTemplate(sections.filter(s =&gt; s.name == n)[0].styles, st);
+        st = st + "&lt;/div&gt;";
+        sectionContent.push(st);
+        sectionNameClasses.push({section: '.' + sectionName, content: '.' + contentName});
+
+        // All section content initially visible
+        sectionContentVisible['.' + contentName] = true;
+    });
+
+    $("#__sections").html(sectionContent.join(''));
+
+    wireUpSectionEvents(sectionNameClasses);
+    wireUpSectionStyleEvents(sections);
+}
+</pre>
+<p>We do a few things here:</p>
+<ol>
+<li>We replace token <code>{sectionName}</code> simply with the section index, the full name <code>__sectionName[n]</code> which is used later on to wire up the event for clicking on the section name, which collapses or reveals the section contents.</li>
+<li>A <code>div</code> is created for the section content -- the style name and "input" control.</li>
+<li>All the sections are marked as initially visible.</li>
+<li>The sections, along with their content, are then joined and this replaces the stub in the div with the ID <code>__sections</code>.</li>
+</ol>
+<p>Creating the section template continues to parse the metadata that defines the styles in each section</p>
+<pre lang='jscript'>
+function createSectionStyleTemplate(styles, template) {
+    styles.forEach(s =&gt;
+    {
+        let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
+        template = template + overrideTemplate.replaceAll('{name}', s.style);
+    });
+
+    return template;
+}
+</pre>
+<p>Here, the specific input template, being at this point either <code>input</code> or <code>checkbox</code> is acquired and the token <code>{name}</code> is replaced with the style name.</p>
+<p>Lastly, the events that handle events when the user tabs off a section or presses the ENTER key is wired up.  Because the sections are dynamically generated, we have to use the <code>on</code> event of the <code>document</code>:</p>
+<pre lang='jscript'>
+function wireUpSectionEvents(sectionNameClasses) {
+
+    sectionNameClasses.forEach(sni =&gt;
+    {
+        // When clicking on the section div, show or hide the content.
+        // This doesn't work:
+        // $(sni.section).on('click', () =&gt; showOrHideContent(sni.content));
+        // We have to wire this up at the document level and pass in the selector!
+        // See: https://stackoverflow.com/a/29674985/2276361
+        $(document).on('click', sni.section, () =&gt; showOrHideSectionContent(sni.content));
+    })
+}
+
+function wireUpSectionStyleEvents(sections) {
+    // Also wire up future property style input boxes and checkbox events.
+    sections.forEach(section =&gt;
+    {
+        section.styles.filter(s=&gt;s.control=='input').forEach(sectStyle =&gt;
+        {
+            let inputElement = '#__inputProperty' + sectStyle.style;
+            
+            $(document).on('keydown', inputElement + 'h', onInputKeyPress);
+            $(document).on('blur', inputElement + 'h', onUpdateElementStyle);
+
+            $(document).on('keydown', inputElement + 'v', onInputKeyPress);
+            $(document).on('blur', inputElement + 'v', onUpdateElementStyle);
+        });
+
+        section.styles.filter(s=&gt;s.control=='checkbox').forEach(sectStyle =&gt;
+        {
+            let inputElement = '#__inputProperty' + sectStyle.style;
+            $(document).on('click', inputElement + 'h', onCheckbox);
+            $(document).on('click', inputElement + 'v', onCheckbox);
+        });
+    });
+}
+</pre>
+<p>At the end of the day, we do things like collapse the sections:</p>
+<img src='editor4.png'</img>
+<p>as well as tab (<code>blur</code>) off an input or press the ENTER key to accept the change.</p>
+<p>Once the properties section <i>template</i> has been initialized, it is copied into the specific views. 
+ Recall:</p>
+<pre lang='jscript'>
+setupPropertiesContainer('h');
+setupPropertiesContainer('v');
+</pre>
+<p>Which is a simple function:</p>
+<pre lang='jscript'>
+function setupPropertiesContainer(hv) {
+    let html = $('#__sourcePropertiesContainer').html();
+    // Resolve the final dynamic ID with h or v to distinguish which property
+    // is being changed.
+    html = html.replaceAll('{hv}', hv);
+    $('.__propertiesContainer' + hv).html(html);
+}
+</pre>
+<p>Note that the token <code>{hv}</code> replacement is done here.</p>
+<h3>Document Events</h3>
+<p>There are document-wide events that are also handled that do some fancy things which I'll describe later.  These behaviors are wired up like this:</p>
+<pre lang='jscript'>
+function wireUpEvents() {
+    $('#__editorh').keyup(event =&gt; editorKeyPress(event, '#__editorh', '#__previewh'));
+    $('#__editorv').keyup(event =&gt; editorKeyPress(event, '#__editorv', '#__previewv'));
+    $('#__editorh').keydown(event =&gt; editorKeyDown(event, '#__editorh', '#__previewh'));
+    $('#__editorv').keydown(event =&gt; editorKeyDown(event, '#__editorv', '#__previewv'));
+    $('#__editorh').on('paste', event =&gt; onPaste(event, '#__editorh', '#__previewh'));
+    $('#__editorv').on('paste', event =&gt; onPaste(event, '#__editorv', '#__previewv'));
+    $('.__preview').mouseover(event =&gt; previewMouseOver(event.target));
+    $('.__preview').mouseleave(event =&gt; clearProperties());
+    $('.__preview').click(event =&gt; previewClick(event));
+    $('.__showHorizontal').click(() =&gt; showHorizontalLayout());
+    $('.__showVertical').click(() =&gt; showVerticalLayout());
+    $('.__clearEditors').click(() =&gt; clearEditors());
+    $('.__save').click(() =&gt; save());
+
+    // Handle CR
+    $('.__propertyName').keypress((event) =&gt; propertyNameKeyPress(event));
+    $('.__propertyId').keypress((event) =&gt; propertyIdKeyPress(event));
+
+    // Handle lose focus
+    $('.__propertyName').blur((event) =&gt; {
+        updateElementName(event);
+        updateSource();
+    });
+
+    $('.__propertyId').blur((event) =&gt; {
+        updateElementId(event);
+        updateSource();
+    });
+}
+</pre>
+<h3>More Metadata - Custom Keys</h3>
+<p>There ability to specify custom key behaviors is also defined in metadata:</p>
+<pre lang='jscript'>
+keymap = [
+    {special: 'alt', key: 'C', insert: ['&lt;code&gt;', '&lt;/code&gt;'] },
+    {special: 'alt', key: 'P', insert: ['&lt;p&gt;', '&lt;/p&gt;'] },
+    {special: 'alt', key: 'R', insert: ['&lt;p&gt;&amp;nbsp;', '&lt;/p&gt;'], eoi: true}, // cursor at end of insert 
+    {special: 'alt', key: 'O', insert: ['&lt;ol&gt;', '&lt;/ol&gt;'] },
+    {special: 'alt', key: 'U', insert: ['&lt;ul&gt;', '&lt;/ul&gt;'] },
+    {special: 'alt', key: 'L', insert: ['&lt;li&gt;', '&lt;/li&gt;'] },
+    {special: 'alt', key: 'B', insert: ['&lt;b&gt;', '&lt;/b&gt;'], toggle: true },
+    {special: 'alt', key: 'I', insert: ['&lt;i&gt;', '&lt;/i&gt;'], toggle: true },
+    {special: 'alt', key: '1', insert: ["&lt;pre lang='cs'&gt;", '&lt;/pre&gt;'] },
+    {special: 'alt', key: '2', insert: ["&lt;pre lang='jscript'&gt;", '&lt;/pre&gt;'] },
+    {special: 'alt', key: '3', insert: ["&lt;pre lang='html'&gt;", '&lt;/pre&gt;'] },
+    {special: 'alt', key: '4', insert: ["&lt;pre lang='css'&gt;", '&lt;/pre&gt;'] },
+];
+</pre>
+<p>Note here that these are all wired up with <code>alt</code> key combinations to avoid browser behaviors that might be associated with <code>ctrl</code> or other key combinations.  When writing this article, I've found that these shortcut keys really streamline the process of writing -- I'm no longer hand-typing the <code>code</code> and <code>pre</code> tags, and having the <code>alt 1-4</code> keys mapped to specific <code>lang</code> options is really nice!</p>
+<h3>Demo Initialization</h3>
+<p>Lastly, recall in the <code>initialize()</code> function the last two lines:</p>
+<pre lang='jscript'>
+showHorizontalLayout();
+demo();
+</pre>
+<p>These set up the initial editor layout and put something in the editor so you can start playing with it right away.  For completeness I'll show the three functions that control which layout you are using and also the function to clear the layout:</p>
+<pre lang='jscript'>
+function showVerticalLayout() {
+    copy('h', 'v');
+    $('#__verticalView').removeClass('__hidden');
+    $('#__horizontalView').addClass('__hidden');
+    currentEditor = '#__editorv';
+    currentPreview = '#__previewv';
+}
+
+function showHorizontalLayout() {
+    copy('v', 'h');
+    $('#__verticalView').addClass('__hidden');
+    $('#__horizontalView').removeClass('__hidden');
+    currentEditor = '#__editorh';
+    currentPreview = '#__previewh';
+}
+
+function clearEditors() {
+    $('#__editorh').val('');
+    $('#__editorv').val('');
+    $('#__previewh').html('');
+    $('#__previewv').html('');
+}
+</pre>
+<p>And lastly, initializing the editor:</p>
+<pre lang='jscript'>
+function demo() {
+    let demoText="&lt;style>\n
+        p {\n
+           margin: 0px 0px 0px 5px;\n
+          }\n
+        .mydiv {\n
+           background-color: red;\n
+           margin: 5px;\n
+        &lt;/style>\n
+        &lt;p id="hi">Hello World!&lt;/p>
+        &lt;div class="mydiv" id="div">DIV Content&lt;/div>
+        &lt;input value="An Input">";
+    $('#__editorv').val(demoText);
+    $('#__previewv').html(demoText);
+    $('#__editorh').val(demoText);
+    $('#__previewh').html(demoText);
+}
+</pre>
+<h2>Code Dive - Event Handlers</h2>
+<p>The real brains of the editor is in the event handlers, so let's take a look at them.</p>
+
+
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
 
 <p></p>
-Wiring up Events
-Initialization
-Property Grid and more events
-Dynamic Rending
 Event Handlers
 Misc. Functions
 Tricks

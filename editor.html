@@ -354,6 +354,7 @@ function initialize() {
     setupPropertiesContainer('h');
     setupPropertiesContainer('v');
     wireUpEvents();
+    showHorizontalLayout();
     demo();
 }
 
@@ -403,8 +404,6 @@ function wireUpEvents() {
         updateElementId(event);
         updateSource();
     });
-
-    showHorizontalLayout();
 }
 
 function setupButtonBar() {
@@ -442,7 +441,7 @@ function setupSourcePropertiesContainer() {
         let contentName = '__content' + n;
         let st = sectionTemplate.replaceAll('{sectionName}', n);
         st = st + "<div class='" + contentName + "'>";
-        st = createTemplate(sections.filter(s => s.name == n)[0].styles, st);
+        st = createSectionStyleTemplate(sections.filter(s => s.name == n)[0].styles, st);
         st = st + "</div>";
         sectionContent.push(st);
         sectionNameClasses.push({section: '.' + sectionName, content: '.' + contentName});
@@ -455,6 +454,12 @@ function setupSourcePropertiesContainer() {
 
     $("#__sections").html(sectionContent.join(''));
 
+    wireUpSectionEvents(sectionNameClasses);
+    wireUpSectionStyleEvents(sections);
+}
+
+function wireUpSectionEvents(sectionNameClasses) {
+
     sectionNameClasses.forEach(sni =>
     {
         // When clicking on the section div, show or hide the content.
@@ -464,7 +469,9 @@ function setupSourcePropertiesContainer() {
         // See: https://stackoverflow.com/a/29674985/2276361
         $(document).on('click', sni.section, () => showOrHideSectionContent(sni.content));
     })
+}
 
+function wireUpSectionStyleEvents(sections) {
     // Also wire up future property style input boxes and checkbox events.
     sections.forEach(section =>
     {
@@ -578,7 +585,7 @@ function updateElementId(event) {
     updateOtherPropertyGrid('#' + event.currentTarget.id, val);
 }
 
-function createTemplate(styles, template) {
+function createSectionStyleTemplate(styles, template) {
     styles.forEach(s =>
     {
         let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
@@ -1000,7 +1007,6 @@ function demo() {
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
     $('#__previewh').html(demoText);
-    // showVerticalLayout();
 }
 
 // Copy from one editor to the other
