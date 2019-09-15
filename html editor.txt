@@ -1,11 +1,10 @@
-<style>
-     .foo {background-color: green;}
-</style>
-<body>
-<h2>Introduction</h2>
+<img src="editor8.png">
+<h2><a name="0">Table of Contents</a></h2>
+<div id="toc"><ul><ul><li><a href="#1">Introduction</a></li><ul><li><a href="#2">Fun Things on the TODO List</a></li><li><a href="#3">A Word About CSS</a></li><li><a href="#4">Cascading Styles</a></li><li><a href="#5">Keyboard Shortcuts</a></li><li><a href="#6">Bugs</a></li><li><a href="#7">HTML is Not "Objects"</a></li><li><a href="#8">Noteworthy</a></li><li><a href="#9">Screenshots</a></li></ul><li><a href="#10">Code Dive - The Basic Structure</a></li><ul><li><a href="#11">HTML Layout</a></li><li><a href="#12">Templates</a></li><ul><li><a href="#13">The Toolbar Template</a></li><li><a href="#14">The Element Template</a></li><li><a href="#15">The Property Section Template</a></li><li><a href="#16">Input Style Template</a></li><li><a href="#17">Checkbox Style Template</a></li></ul><li><a href="#18">Metadata</a></li><li><a href="#19">Global Variables</a></li></ul><li><a href="#20">Code Dive - Initialization</a></li><ul><li><a href="#21">Section Initialization</a></li><li><a href="#22">Setup the Button Bar</a></li><li><a href="#23">Setup The Properties Container</a></li><li><a href="#24">Document Events</a></li><li><a href="#25">More Metadata - Custom Keys</a></li><li><a href="#26">Demo Initialization</a></li></ul><li><a href="#27">Code Dive - Event Handlers</a></li><ul><li><a href="#28">Hovering Over and Selecting an Element</a></li><li><a href="#29">Style Editor Events</a></li><li><a href="#30">Editor Keyboard Events</a></li><ul><li><a href="#31">Trick: Clearing the Style Rule</a></li><li><a href="#32">Trick: Tab and Encoding Keys</a></li><li><a href="#33">Table of Contents Generation</a></li></ul></ul><li><a href="#34">Conclusion</a></li></ul></ul></div>
+<h2><a name="1">Introduction</a></h2>
 <p>I've been interested about writing an HTML editor with some specific features, namely a preview window as well as a property pane to view/manipulate attributes and properties of the various elements.  After writing the article <a href="https://www.codeproject.com/Articles/5164453/Fun-Exploring-Div-and-Table-Layout">Fun Exploring Div and Table Layout</a>, it seemed like a natural progression to put that article to use doing something real, so here we are.</p>
 <p>The main talking points and interesting tricks employed here are:</p>
-<p><ul>
+<p></p><ul>
 <li>Creating an editor with both horizontal and vertical layout of the editor, preview, and properties sections.</li>
 <li>Updating the preview as changes are made in the editor.</li>
 <li>Synchronize the property values between the two editor "views."</li>
@@ -16,9 +15,9 @@
 <li>Dynamic HTML for generating the property sections.</li>
 <li>Resetting the CSSOM so styles in the preview reflect changes in the <code>&lt;style&gt;</code> section in editor.</li>
 </ul>
-</p>
+<p></p>
 
-<h3>Fun Things on the TODO List</h3>
+<h3><a name="2">Fun Things on the TODO List</a></h3>
 <p>These are things I'd like to continue to explore but sort of break the "bare bones" editor concept presented here as things like token colorization will require a real editor, not just the <code>textarea</code> element used here.</p>
 <ul>
 <li>A real menu bar.</li>
@@ -30,7 +29,7 @@
 <li>Views as objects (see section on "HTML is Not Objects" below.)</li>
 <li>Search and replace.</li></ul>
 
-<h3>A Word About CSS</h3>
+<h3><a name="3">A Word About CSS</a></h3>
 In discussions on Code Project and in writing this, I've come to realize that there are different uses of CSS:
 
 <ol>
@@ -44,37 +43,35 @@ In discussions on Code Project and in writing this, I've come to realize that th
 
 <p>Of particular importance is the idea that you <b>never, ever</b>, want to use a tag (typically a class) for both layout styling and selection.  Even if this seems like a perfectly reasonable thing to do when you're starting to develop the page, it can become a nightmare when you need to customize the layout and suddenly you need two different class tags but the behavior for manipulating the element is tied to class tag that describes the layout.</p>
 
-<h3>Cascading Styles</h3>
+<h3><a name="4">Cascading Styles</a></h3>
 <p>OK, I despise cascading styles for the simple reason that if you change the structure of the markup, it invalidates the cascading structure of the CSS.  I much prefer flat CSS in which (typically) the class tag describes what is applied for that element in the HTML structure.</p>
 
-<h3>Keyboard Shortcuts</h3>
+<h3><a name="5">Keyboard Shortcuts</a></h3>
 <p>In this editor I'm mapping a several keyboard shortcuts using the <code>ALT</code> key.  Certain extensions in Chrome (and I suppose other browsers) may trigger instead.  At least in Chrome, you can go to <a href="chrome://extensions/shortcuts">chrome://extensions/shortcuts</a> and change the keyboard mappings (or disable them) if you find they interfere with the shortcuts in this editor.  Even using  <code>event.preventDefault()</code> doesn't stop an extension with a shortcut from taking over!</p>
 
-<h3>Bugs</h3>
+<h3><a name="6">Bugs</a></h3>
 <p>I've noticed a couple odd things on occasion:
-<ul><li>The "wrap selected text with markup" sometimes doesn't pick the entire selected text.  No idea why.</li><li>The preview editor doesn't automatically scroll to the where you are editing text in the editor. 
+</p><ul><li>The "wrap selected text with markup" sometimes doesn't pick the entire selected text.  No idea why.</li><li>The preview editor doesn't automatically scroll to the where you are editing text in the editor. 
  This is a particularly annoying problem to figure out how to track where the user is in the editor and position the vertical scrollbar so the user can see the preview as well.  The only way that I can think of to fix this is to figure out the current element that wraps where the user is typing and use <code>scrollIntoView()</code>.  This seems complicated as a custom tag will have to be created to identify the element and then removed.  I already employ this trick when switching between horizontal and vertical layouts when an element is selected.</li>
 <li>I use a double space when starting a new sentence, something I learned in school ages ago.  The editor needs to replace additional spaces with <code>&amp;nbsp;</code> otherwise it renders as a single space.</li>
 <li>The preview doesn't update after you paste something into the editor.  You have to press a key, like one of the cursor keys, to see what you pasted.  Just haven't gotten around to fixing that.</li>
-</ul></p>
-<h3>HTML is Not "Objects"</h3>
+</ul><p></p>
+<h3><a name="7">HTML is Not "Objects"</a></h3>
 <p>If I were writing this as a WinForm app, I could easily assign the <code>TextBox</code> to the "other" layout panel as a child control, and all the text, selections, events, etc., would just move over.  HTML is not like that.  In the layout of this editor you'll see that I've duplicated the editor, preview, and property "controls" but this means that they require separate event handlers and proper updating when the user switches between v/h layouts.  It's annoying and could be worked around with a mechanism that would treat the HTML sections as true objects.  This was too complicated to implement at this point.</p>
-<p>&nbsp;</p>
-<h3>Noteworthy</h3>
-<p>I wrote this editor entirely in VisualStudio Code using the <a href="https://marketplace.visualstudio.com/items?itemName=daiyy.quick-html-previewer">Quick HTML Previewer</a>, which handles the HTML, CSS, and even Javascript, even importing jQuery.  Debugging I did in Chrome, but it's impressive what Quick HTML Previewer will do!</p><p>&nbsp;</p>
+<h3><a name="8">Noteworthy</a></h3>
+<p>I wrote this editor entirely in VisualStudio Code using the <a href="https://marketplace.visualstudio.com/items?itemName=daiyy.quick-html-previewer">Quick HTML Previewer</a>, which handles the HTML, CSS, and even Javascript, even importing jQuery.  Debugging I did in Chrome, but it's impressive what Quick HTML Previewer will do!</p>
 <p>Also of note is that, yes, I'm using jQuery.  It's just so much easier to use, especially when manipulating multiple elements of the same class tag.</p>
-<h3>Screenshots</h3>
+<h3><a name="9">Screenshots</a></h3>
 <p>Horizontal Layout:</p>
-<img src='editor2.png'/>
+<img src="editor2.png">
 <p>&nbsp;</p>
 <p>Vertical Layout:</p>
-<img src='editor1.png'/>
-<h2>Code Dive - The Basic Structure</h2>
+<img src="editor1.png">
+<h2><a name="10">Code Dive - The Basic Structure</a></h2>
 So let's look under the hood.
-<h3>HTML Layout</h3>
+<h3><a name="11">HTML Layout</a></h3>
 <p>First thing to take a look at is the layout of the HTML.  The horizontal (side-by-side) structure looks like this:</p>
-<pre lang='html'>
-&lt;div class='__fullscreen __hidden' id='__horizontalView'&gt;    
+<pre lang="html">&lt;div class='__fullscreen __hidden' id='__horizontalView'&gt;    
     &lt;div class='__parent __toolbar'&gt;
         &lt;div class="__child-middle-left __buttonBar"&gt;&lt;/div&gt;
     &lt;/div&gt;
@@ -98,8 +95,7 @@ So let's look under the hood.
 &lt;/div&gt;
 </pre>
 Contrast this with the vertical layout in which the editor and preview are top-bottom and the properties section is on the right:
-<pre lang='html'>
-&lt;div class='__fullscreen' id='__verticalView'&gt;
+<pre lang="html">&lt;div class='__fullscreen' id='__verticalView'&gt;
     &lt;table class='__noborders __fill'&gt;
         &lt;tr style='height:1px;'&gt;
             &lt;div class='__parent __toolbar'&gt;
@@ -132,17 +128,16 @@ Contrast this with the vertical layout in which the editor and preview are top-b
 &lt;/div&gt;    
 </pre>
 <p>Not much different, is it?  Some things of note:
-<ul>
+</p><ul>
 <li>All class and id tags are prefixed with <code>__</code>.  Why?  Because I don't want the tags used in the editor to conflict with the tags that the user might create for their own markup.  Technically I should also prefix the functions with <code>__</code> as well, but at some point I plan on wrapping them in <code>class</code> containers, so the point of doing that becomes somewhat moot.</li>
 <li>Note that we have two editors, previews, and property containers, distinguished by the suffix <code>h</code> and <code>v</code>.  The naming convention here is very intentional as their are functions that rely on these specific suffixes.</li>
 <li>Note that some of the class tags are layout while other class tags are for selecting the element.</li>
 </ul>
-</p>
-<h3>Templates</h3>
+<p></p>
+<h3><a name="12">Templates</a></h3>
 <p>There are various templates used to populate the views with dynamic data as well as to duplicate common features, that being the toolbar at the top.</p>
-<h4>The Toolbar Template</h4>
-<pre lang='html'>
-&lt;div class='__hidden' id='__sourceButtonBar'&gt;
+<h4><a name="13">The Toolbar Template</a></h4>
+<pre lang="html">&lt;div class='__hidden' id='__sourceButtonBar'&gt;
     &lt;button class='__showHorizontal'&gt;Horizontal&lt;/button&gt;
     &lt;button class='__showVertical'&gt;Vertical&lt;/button&gt;
     &lt;button class='__clearEditors'&gt;Clear&lt;/button&gt;
@@ -150,9 +145,8 @@ Contrast this with the vertical layout in which the editor and preview are top-b
 &lt;/div&gt;
 </pre>
 <p>This template is simply copied into the horizontal and vertical views. </p>
-<h4>The Element Template</h4>
-<pre lang='html'>
-&lt;div class='__hidden' id = '__sourcePropertiesContainer'&gt;
+<h4><a name="14">The Element Template</a></h4>
+<pre lang="html">&lt;div class='__hidden' id = '__sourcePropertiesContainer'&gt;
     &lt;div class='__propertyItem'&gt;Element: &lt;span class='__text-bold __elementTagName'&gt;&lt;/span&gt;&lt;/div&gt;
     &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;Name:&lt;/span&gt;&lt;input class='__inputPropertyField __propertyName' id='__pname{hv}'&gt;&lt;/div&gt;
     &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;ID:&lt;/span&gt;&lt;input class='__inputPropertyField __propertyId' id='__pid{hv}'&gt;&lt;/div&gt;
@@ -160,38 +154,34 @@ Contrast this with the vertical layout in which the editor and preview are top-b
 &lt;/div&gt;
 </pre>
 <p>This template is used in the properties container at the very top and is responsible for rendering the selected element and it's <code>ID</code> and <code>name</code>.  For example, given this markup (coded directly into the editor):</p>
-<p id='myParagraph' name='fizbin'>This is a demo paragraph.</p>
+<p id="myParagraph" name="fizbin">This is a demo paragraph.</p>
 <p>We see in the properties container:</p>
-<p><img src = 'editor3.png'/></p>
+<p><img src="editor3.png"></p>
 The markup for the above paragraph looks like this:
-<pre lang='html'>&lt;p id='myParagraph' name='fizbin'&gt;This is a demo paragraph.&lt;/p&gt;</pre>
-<h4>The Property Section Template</h4>
+<pre lang="html">&lt;p id='myParagraph' name='fizbin'&gt;This is a demo paragraph.&lt;/p&gt;</pre>
+<h4><a name="15">The Property Section Template</a></h4>
 <p>Properties are organized into sections with a header.  These are dynamically created from the metadata using this template:</p>
-<pre lang='html'>
-&lt;div class='__hidden' id = '__sectionTemplate'&gt;
+<pre lang="html">&lt;div class='__hidden' id = '__sectionTemplate'&gt;
     &lt;div class='__propertItem __section __sectionBar __sectionName{sectionName}'&gt;{sectionName}&lt;/div&gt;
 &lt;/div&gt;
 </pre>
 <p>Notice the use of the field <code>{sectionName}</code> which gets replaced with the actual section name when the properties container is generated.</p>
-<h4>Input Style Template</h4>
+<h4><a name="16">Input Style Template</a></h4>
 <p>Most style properties are simply an input box using this template as the basis for generating the label and input element:</p>
-<pre lang='html'>
-&lt;div class='__hidden' id = '__inputStyleTemplate'&gt;
+<pre lang="html">&lt;div class='__hidden' id = '__inputStyleTemplate'&gt;
     &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;{name}:&lt;/span&gt;&lt;input class='__inputPropertyField' id='__inputProperty{name}{hv}' cssName='{name}'&gt;&lt;/div&gt;
 &lt;/div&gt;
 </pre>
 <p>Notice the use of the fields <code>{name}</code> and <code>{hv}</code> which are used to identify and ID the specific property style name and whether it belongs in the horizontal or vertical view.</p>
-<h4>Checkbox Style Template</h4>
+<h4><a name="17">Checkbox Style Template</a></h4>
 <p>Some style properties technically don't have values -- their existence determines the state of the element.  For these, there is a checkbox template:</p>
-<pre lang='html'>
-&lt;div class='__hidden' id = '__checkboxStyleTemplate'&gt;
+<pre lang="html">&lt;div class='__hidden' id = '__checkboxStyleTemplate'&gt;
     &lt;div class='__propertyItem'&gt;&lt;span class='__propertyLabel'&gt;{name}:&lt;/span&gt;&lt;input class='__checkboxPropertyField' id='__inputProperty{name}{hv}' type='checkbox' cssName='{name}'&gt;&lt;/div&gt;
 &lt;/div&gt;
 </pre>
-<h3>Metadata</h3>
+<h3><a name="18">Metadata</a></h3>
 <p>The metadata determines the property sections and the specific style properties that go in each section.  The metadata also determines what sections should be displayed for a specific element.  Please note that these definitions <b>are not comprehensive</b>.  Add to them as your needs require.  First, the sections and their styles:</p>
-<pre lang='jscript'>
-var sections = [
+<pre lang="jscript">var sections = [
         {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
         {name:'Margins', styles: ['margin-top', 'margin-right', 'margin-bottom', 'margin-left']},
         {name:'Padding', styles: ['padding-top', 'padding-right', 'padding-bottom', 'padding-left']},
@@ -202,8 +192,7 @@ var sections = [
 </pre>
 <p>Note that the <code>Flags</code> section has slightly different format that specifies the control used to render the style option.  By default the control is assumed to be an <code>input</code> element.</p>
 <p>The element tags are then map to the desired sections for that element:</p>
-<pre lang='jscript'>
-var tagSections = [
+<pre lang="jscript">var tagSections = [
     {tag: 'input', sections: ['Margins', 'Padding', 'Flags']},
     {tag: 'p', sections: ['Dimensions', 'Margins', 'Padding', 'Font', 'Border']},
     {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']},
@@ -212,10 +201,9 @@ var tagSections = [
 ];
 </pre>
 <p>Again, this is obviously not a comprehensive list!  Add to the list yourself!</p>
-<h3>Global Variables</h3>
+<h3><a name="19">Global Variables</a></h3>
 <p>Ugh.  Global variables.  These are used throughout the editor code and ought to be put into a static class.  I'm also going to review them at some point to see if they are all necessary.  At the moment, they are used to maintain the state of the editor.</p>
-<pre lang='jscript'>
-var altKeyDown = false;
+<pre lang="jscript">var altKeyDown = false;
 var ctrlKeyDown = false;
 var hoverElement = undefined;
 var selectedElement = undefined;
@@ -225,10 +213,9 @@ var currentPreview = undefined;
 // For preserving section content visibility when we click on tags.
 var sectionContentVisible = [];     
 </pre>
-<h2>Code Dive - Initialization</h2>
+<h2><a name="20">Code Dive - Initialization</a></h2>
 <p>Now that we've covered the structural basics, let's look at the initialization process to understand how the templates and metadata are used to populate the horizontal and vertical layouts.  The core initialization routine is:</p>
-<pre lang='jscript'>
-$(document).ready(() =&gt; initialize());
+<pre lang="jscript">$(document).ready(() =&gt; initialize());
 
 function initialize() {
     initializeSections();
@@ -241,10 +228,9 @@ function initialize() {
     demo();
 }
 </pre>
-<h3>Section Initialization</h3>
+<h3><a name="21">Section Initialization</a></h3>
 <p>The comments really says it all:</p>
-<pre lang='jscript'>
-// The purpose of this is to take the simpler (more human friendly) version of this:
+<pre lang="jscript">// The purpose of this is to take the simpler (more human friendly) version of this:
 // {name:'Dimensions', styles: ['width', 'height', 'max-width', 'max-height']},
 // and convert the styles to an array of objects that looks like this:
 // styles: [{style:'width', control:'input'}]
@@ -262,25 +248,23 @@ function initializeSections()
 }
 </pre>
 <p>I had originally written the code with a bunch of <code>if-else</code> statements based on whether the a <code>control</code> key was defined in the style list.  In my opinion, this was hideous, so I decided to "map" the styles into a common format based on whether the style itself was a <code>string</code> or an <code>object</code>, so this:</p>
-<pre lang='jscript'>styles: ['width', 'height', 'max-width', 'max-height']</pre>
+<pre lang="jscript">styles: ['width', 'height', 'max-width', 'max-height']</pre>
 and this:
-<pre lang='jscript'>styles: [{style:'readonly', control:'checkbox'}]</pre>
+<pre lang="jscript">styles: [{style:'readonly', control:'checkbox'}]</pre>
 <p>get unified into the latter form, where the default control (the array of strings) is mapped into an object:</p>
-<pre lang='jscript'>{style: [stylename], control: 'input'}</pre>
+<pre lang="jscript">{style: [stylename], control: 'input'}</pre>
 <p>This unifies all the handling of the styles in each section but makes it easier for the programmer to define the styles when the list of styles is simply an array of strings.</p>
-<h3>Setup the Button Bar</h3>
+<h3><a name="22">Setup the Button Bar</a></h3>
 <p>Very simple -- just copy the button bar template into the horizontal and vertical views:</p>
-<pre lang='jscript'>
-function setupButtonBar() {
+<pre lang="jscript">function setupButtonBar() {
     let html = $('#__sourceButtonBar').html();
     $('.__buttonBar').html(html);
 }
 </pre>
 <p>The joys if jQuery -- the template HTML is copied into each instance of the element with the class name <code>__buttonBar</code>.</p>
-<h3>Setup The Properties Container</h3>
+<h3><a name="23">Setup The Properties Container</a></h3>
 <p>The properties container is actually a template which is populated with the sections and section style "input" controls, which is then copied into the horizontal and vertical views.</p>
-<pre lang='jscript'>
-function setupSourcePropertiesContainer() {
+<pre lang="jscript">function setupSourcePropertiesContainer() {
     let sectionNames = sections.map(s =&gt; s.name);
 
     let sectionTemplate = $('#__sectionTemplate').html();
@@ -316,8 +300,7 @@ function setupSourcePropertiesContainer() {
 <li>The sections, along with their content, are then joined and this replaces the stub in the div with the ID <code>__sections</code>.</li>
 </ol>
 <p>Creating the section template continues to parse the metadata that defines the styles in each section</p>
-<pre lang='jscript'>
-function createSectionStyleTemplate(styles, template) {
+<pre lang="jscript">function createSectionStyleTemplate(styles, template) {
     styles.forEach(s =&gt;
     {
         let overrideTemplate = $('#__' + s.control + 'StyleTemplate').html();
@@ -329,8 +312,7 @@ function createSectionStyleTemplate(styles, template) {
 </pre>
 <p>Here, the specific input template, being at this point either <code>input</code> or <code>checkbox</code> is acquired and the token <code>{name}</code> is replaced with the style name.</p>
 <p>Lastly, the events that handle events when the user tabs off a section or presses the ENTER key is wired up.  Because the sections are dynamically generated, we have to use the <code>on</code> event of the <code>document</code>:</p>
-<pre lang='jscript'>
-function wireUpSectionEvents(sectionNameClasses) {
+<pre lang="jscript">function wireUpSectionEvents(sectionNameClasses) {
 
     sectionNameClasses.forEach(sni =&gt;
     {
@@ -368,17 +350,15 @@ function wireUpSectionStyleEvents(sections) {
 }
 </pre>
 <p>At the end of the day, we do things like collapse the sections:</p>
-<img src='editor4.png'</img>
+<img src="editor4.png" <="" img="">
 <p>as well as tab (<code>blur</code>) off an input or press the ENTER key to accept the change.</p>
 <p>Once the properties section <i>template</i> has been initialized, it is copied into the specific views. 
  Recall:</p>
-<pre lang='jscript'>
-setupPropertiesContainer('h');
+<pre lang="jscript">setupPropertiesContainer('h');
 setupPropertiesContainer('v');
 </pre>
 <p>Which is a simple function:</p>
-<pre lang='jscript'>
-function setupPropertiesContainer(hv) {
+<pre lang="jscript">function setupPropertiesContainer(hv) {
     let html = $('#__sourcePropertiesContainer').html();
     // Resolve the final dynamic ID with h or v to distinguish which property
     // is being changed.
@@ -387,10 +367,9 @@ function setupPropertiesContainer(hv) {
 }
 </pre>
 <p>Note that the token <code>{hv}</code> replacement is done here.</p>
-<h3>Document Events</h3>
+<h3><a name="24">Document Events</a></h3>
 <p>There are document-wide events that are also handled that do some fancy things which I'll describe later.  These behaviors are wired up like this:</p>
-<pre lang='jscript'>
-function wireUpEvents() {
+<pre lang="jscript">function wireUpEvents() {
     $('#__editorh').keyup(event =&gt; editorKeyPress(event, '#__editorh', '#__previewh'));
     $('#__editorv').keyup(event =&gt; editorKeyPress(event, '#__editorv', '#__previewv'));
     $('#__editorh').keydown(event =&gt; editorKeyDown(event, '#__editorh', '#__previewh'));
@@ -421,10 +400,9 @@ function wireUpEvents() {
     });
 }
 </pre>
-<h3>More Metadata - Custom Keys</h3>
+<h3><a name="25">More Metadata - Custom Keys</a></h3>
 <p>There ability to specify custom key behaviors is also defined in metadata:</p>
-<pre lang='jscript'>
-keymap = [
+<pre lang="jscript">keymap = [
     {special: 'alt', key: 'C', insert: ['&lt;code&gt;', '&lt;/code&gt;'] },
     {special: 'alt', key: 'P', insert: ['&lt;p&gt;', '&lt;/p&gt;'] },
     {special: 'alt', key: 'R', insert: ['&lt;p&gt;&amp;nbsp;', '&lt;/p&gt;'], eoi: true}, // cursor at end of insert 
@@ -440,15 +418,13 @@ keymap = [
 ];
 </pre>
 <p>Note here that these are all wired up with <code>alt</code> key combinations to avoid browser behaviors that might be associated with <code>ctrl</code> or other key combinations.  When writing this article, I've found that these shortcut keys really streamline the process of writing -- I'm no longer hand-typing the <code>code</code> and <code>pre</code> tags, and having the <code>alt 1-4</code> keys mapped to specific <code>lang</code> options is really nice!</p>
-<h3>Demo Initialization</h3>
+<h3><a name="26">Demo Initialization</a></h3>
 <p>Lastly, recall in the <code>initialize()</code> function the last two lines:</p>
-<pre lang='jscript'>
-showHorizontalLayout();
+<pre lang="jscript">showHorizontalLayout();
 demo();
 </pre>
 <p>These set up the initial editor layout and put something in the editor so you can start playing with it right away.  For completeness I'll show the three functions that control which layout you are using and also the function to clear the layout:</p>
-<pre lang='jscript'>
-function showVerticalLayout() {
+<pre lang="jscript">function showVerticalLayout() {
     copy('h', 'v');
     $('#__verticalView').removeClass('__hidden');
     $('#__horizontalView').addClass('__hidden');
@@ -472,49 +448,521 @@ function clearEditors() {
 }
 </pre>
 <p>And lastly, initializing the editor:</p>
-<pre lang='jscript'>
-function demo() {
-    let demoText="&lt;style>\n
+<pre lang="jscript">function demo() {
+    let demoText="&lt;style&gt;\n
         p {\n
            margin: 0px 0px 0px 5px;\n
           }\n
         .mydiv {\n
            background-color: red;\n
            margin: 5px;\n
-        &lt;/style>\n
-        &lt;p id="hi">Hello World!&lt;/p>
-        &lt;div class="mydiv" id="div">DIV Content&lt;/div>
-        &lt;input value="An Input">";
+        &lt;/style&gt;\n
+        &lt;p id="hi"&gt;Hello World!&lt;/p&gt;
+        &lt;div class="mydiv" id="div"&gt;DIV Content&lt;/div&gt;
+        &lt;input value="An Input"&gt;";
     $('#__editorv').val(demoText);
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
     $('#__previewh').html(demoText);
 }
 </pre>
-<h2>Code Dive - Event Handlers</h2>
+<h2><a name="27">Code Dive - Event Handlers</a></h2>
 <p>The real brains of the editor is in the event handlers, so let's take a look at them.</p>
+<h3><a name="28">Hovering Over and Selecting an Element</a></h3>
+<p>Selecting an element is the first step in editing its style.  However, there is a "preview" model which tracks the mouse position and displays the style attribute-values over any element in the preview pane.  This "hover preview" is active only when an element has not been selected and is implemented by these three functions:</p>
+<pre lang="jscript">function previewMouseOver(element) {
+    // Setup for mouse click elsewhere.
+    if (element.classList.contains('__preview')) {
+        hoverElement = undefined;
+    } else {
+        hoverElement = element;
+    }
 
+    // Ignore the __preview box itself and, if we have a selected element, don't update the property list during a hover.
+    if (!element.classList.contains('__preview') &amp;&amp; !selectedElement) {
+        showProperties(element);
+    }
+    else {
+        clearProperties();
+    }
+}
 
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
-<p>&nbsp;</p>
+function showProperties(element) {
+    let tagName = element.tagName;
+    $('.__elementTagName').text(tagName);
+    $('.__bothPropertiesContainer').removeClass('__hidden');
+    $('.__propertyName').val($(element).attr('name'));
+    $('.__propertyId').val($(element).attr('id'));
+    showAllowableSections(tagName);
+    populateStyleValues(element, tagName);
+}
 
+function clearProperties() {
+    if (!selectedElement) {
+        $('.__elementTagName').text('');
+        $('.__bothPropertiesContainer').addClass('__hidden');
+        hoverElement = undefined;
+    }
+}
+</pre>
+<p>The supporting functions <code>showAllowableSections</code> and <code>populateStyleValues are implemented as:</code></p> 
+<pre lang="jscript">function showAllowableSections(tagName) {
+    let lcTagName = tagName.toLowerCase();
+    let sectionNames = sections.map(s =&gt; s.name);
+    let section = tagSections.filter(s =&gt; s.tag == lcTagName)[0];
 
-<p></p>
-Event Handlers
-Misc. Functions
-Tricks
+    if (section) {
+        let allowableSections = section.sections;
 
+        sectionNames.forEach(sn =&gt; {
+            let sectionName = '.__sectionName' + sn;
+            let contentName = '.__content' + sn;
+            if (allowableSections.includes(sn)) {
+                $(sectionName).removeClass('__hidden');
 
+                // Restore state when section can be displayed.
+                if (sectionContentVisible[contentName]) {
+                    $(contentName).removeClass('__hidden');
+                } else {
+                    $(contentName).addClass('__hidden');
+                }
+            } else {
+                // always hide if excluded.
+                $(sectionName).addClass('__hidden');
+                $(contentName).addClass('__hidden');
+            }
+        });
+    } else {
+        clearProperties();        
+    }
+}
 
+function populateStyleValues(el, tagName) {
+    let lcTagName = tagName.toLowerCase();
+    let sectionNames = sections.map(s =&gt; s.name);
+    let section = tagSections.filter(s =&gt; s.tag == lcTagName)[0];
 
-<p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p><p>&nbsp;</p>
+    if (section) {
+        let allowableSections = section.sections;
 
+        allowableSections.forEach(s =&gt;
+        {
+            if (sections.filter(section =&gt; section.name == s).length &gt; 0) {
+                let sectionStyles = sections.filter(section =&gt; section.name == s)[0].styles;
 
+                sectionStyles.forEach(sectStyle =&gt;
+                {
+                    let inputElement = '#__inputProperty' + sectStyle.style;
 
+                    if (sectStyle.control == 'checkbox') {
+                        let attr = sectStyle.style;
+                        let checked = $(el).prop(attr);
+                        $(inputElement + 'h').prop('checked', checked);       
+                        $(inputElement + 'v').prop('checked', checked);       
+                    } else {
+                        let styleValue = $(el).css(sectStyle.style);
+                        $(inputElement + 'h').val(styleValue);
+                        $(inputElement + 'v').val(styleValue);
+                    }
+                });
+            } else {
+                console.log('Section ' + s + ' is not defined.');
+            }
+        });
+    }
+}
+</pre>
+<p>Note that <code>populateStyleValues</code> has the only case where the control type is checked because we have to handle the setting of the <code>checkbox</code> state differently that that of the <code>input</code> element value.</p>
+<p>When the user clicks on a element, which is handled by the parent level <code>div:</code></p>
+<pre lang="jscript">$('.__preview').click(event =&gt; previewClick(event));
+</pre>
+<p>The currently hovering-over element is selected, or if there is no element selected, the properties are cleared and the preview behavior returns to "hover preview":</p>
+<pre lang="jscript">function previewClick(event) {
+    selectedElement = hoverElement;
 
+    if (selectedElement) {
+        showProperties(selectedElement);
+    } else {
+        clearProperties();
+    }
+}
+</pre>
 
-</body>
+<h3><a name="29">Style Editor Events</a></h3>
+<p>Two events are wired up for the input box elements of the style section, <code>keydown</code> and <code>blur</code>, for both horizontal and vertical views:</p>
+<pre lang="jscript">$(document).on('keydown', inputElement + 'h', onInputKeyPress);
+$(document).on('blur', inputElement + 'h', onUpdateElementStyle);
+
+$(document).on('keydown', inputElement + 'v', onInputKeyPress);
+$(document).on('blur', inputElement + 'v', onUpdateElementStyle);
+</pre>
+<p>And one for each view for <code>checkbox</code> controls:</p>
+<pre lang="jscript">$(document).on('click', inputElement + 'h', onCheckbox);
+$(document).on('click', inputElement + 'v', onCheckbox);
+</pre>
+<p>The <code>keydown</code> event and <code>blur</code> events share common code but the reason they call into the method <code>updateElementStyle</code> is simply to separate the event function from the logic that performs the style update.  This way, you can add functionality specific to the event handler without affecting the underlying behavior.</p>
+<pre lang="jscript">function onInputKeyPress(event) {
+    if (event.keyCode == 13) {
+        updateElementStyle(event);
+    }
+}
+
+function onUpdateElementStyle(event) {
+    updateElementStyle(event);
+}
+
+function updateElementStyle(event) {
+    let elName = '#' + event.target.id;
+    let el = $(elName);
+    let attr = $(el).attr('cssName');
+    let val = el.val();
+    $(selectedElement).css(attr, val);       
+    updateSource();
+    updateOtherPropertyGrid(elName, val);
+}
+</pre>
+<p>Note that the "other" view's property pane is also updated:</p>
+<pre lang="jscript">function updateOtherPropertyGrid(elName, val) {
+    // We also need to update the complimentary input in the other properties section
+    // Remove the trailing h or v.
+    let hv = elName[elName.length - 1];
+    let althv = hv == 'h' ? 'v' : 'h';
+    let elx = elName.slice(0, -1) + althv;
+    $(elx).val(val);
+}
+</pre>
+<p>The <code>checkbox</code> event is similar:</p>
+<pre lang="jscript">function onCheckbox(event) {
+    let elName = '#' + event.currentTarget.id;
+    let el = $(elName);
+    let attr = $(el).attr('cssName');
+    let checked = el.is(':checked');
+    $(selectedElement).prop(attr, checked);       
+    updateSource();
+
+    // like updateOtherPropertyGrid
+    let hv = elName[elName.length - 1];
+    let althv = hv == 'h' ? 'v' : 'h';
+    let elx = elName.slice(0, -1) + althv;
+    $(elx).prop('checked', checked);       
+}
+</pre>
+<p>Note that in all cases, the function <code>updateSource</code> is called, which updates the text in the editor:</p>
+<pre lang="jscript">function updateSource() {
+    let editor = $(currentEditor);
+    let preview = $(currentPreview);
+    let text = preview.html();
+    editor.val(text);
+}
+</pre>
+<h3><a name="30">Editor Keyboard Events</a></h3>
+<p>There are some, what I think are snazzy, features when editing the HTML.  The keypress is checked for a shortcut key which either inserts or toggles (adds or removes) markup (or whatever is defined in the <code>keymap</code> metadata:</p>
+<pre lang="jscript">function editorKeyPress(event, sourceEditor, targetPreview) {
+    let key = String.fromCharCode(event.which);
+    let editor = $(sourceEditor);
+    let preview = $(targetPreview);
+    let editorText = editor.val();
+
+    if (ctrlKeyDown || altKeyDown) {
+        let start = editor[0].selectionStart;
+        let end = editor[0].selectionEnd;
+        let s1 = editorText.substring(0, start);
+        let s2 = editorText.substring(end);
+        let between = editorText.substring(start, end);
+
+        // TODO: Check that other metakeys aren't down
+        // TODO: Handle combination of meta keys.
+        // TODO: Maybe handle key combinations.
+        if (altKeyDown) {
+            map = keymap.filter(k =&gt; k.special == 'alt' &amp;&amp; k.key == key);
+
+            if (map.length == 1) {
+                map = map[0];
+
+                if (map.toggle) {
+                    toggleTags(editor, preview, map.insert[0], map.insert[1], editorText, s1, between, s2, start, end);
+                } else {
+                    insertTags(editor, preview, map.insert[0], map.insert[1], s1, between, s2, end, map.eoi);
+                }
+
+                event.preventDefault();
+            }
+        }
+
+        /*
+        if (ctrlKeyDown) {
+            switch(key) {            
+            }
+        }
+        */
+    } else {
+        clearSpuriousStyle();
+        preview.html(editorText);
+    }
+}
+</pre>
+<p>The insert and toggle functionality:</p>
+<pre lang="jscript">function insertTags(editor, preview, t1, t2, s1, between, s2, end, eoiFlag) {
+    let newText = s1 + t1 + between + t2 + s2;
+    let newIdx = end + t1.length;
+    $(editor).val(newText);                
+
+    if (eoiFlag) {
+        editor[0].selectionStart = newIdx + t2.length;
+        editor[0].selectionEnd = newIdx + t2.length;
+    } else {
+        // Set cursor between the tags and at the end of the selected (if any) text.
+        editor[0].selectionStart = newIdx;
+        editor[0].selectionEnd = newIdx;
+    }
+
+    preview.html(newText);
+}
+
+// Not the smartest toggling, as it doesn't search for the outermost tags but only
+// if they are immediately adjecent to the selected text.
+function toggleTags(editor, preview, t1, t2, editorText, s1, between, s2, start, end) {
+    var newText = editorText;
+
+    if (start - t1.length &gt;= 0 &amp;&amp; 
+        (editorText.substring(start-t1.length, start) == t1) &amp;&amp;
+        end + t1.length &lt; editorText.length &amp;&amp;
+        (editorText.substring(end, end + t2.length) == t2) ) {
+        // Remove tags
+        s1 = editorText.substring(0, start - t1.length);
+        between = editorText.substring(start, end);
+        s2 = editorText.substring(end + t2.length);
+        newText = s1 + between + s2;
+        $(editor).val(newText);                
+
+        // Preserve selected text.
+        editor[0].selectionStart = start - t1.length;
+        editor[0].selectionEnd = end - t1.length;
+    } else {
+    // Add tags.
+        newText = s1 + t1 + between + t2 + s2;
+        $(editor).val(newText);                
+
+        // Preserve selected text.
+        editor[0].selectionStart = start + t1.length;
+        editor[0].selectionEnd = end + t1.length;
+    }
+
+    preview.html(newText);
+}
+</pre>
+<h4><a name="31">Trick: Clearing the Style Rule</a></h4>
+<p>So what is this call to <code>clearSpuriousStyle</code> when a key is processed normally?  First, let me describe the problem.  Let's say you start off with the demo markup in the default horizontal view:</p>
+<img src="editor5.png">
+<p>Next, you change the background color of <code>DIV</code> to green:</p>
+<img src="editor6.png">
+<p>Why is it still red???</p>
+<p>The reason for this is that the <code>document</code> for some reason has a two identical versions of the editor's stylesheet, index 0 being the CSS rules for the editor itself:</p>
+<img src="editor7.png">
+<p>This behavior occurs only on the horizontal view because the CSS is at index 1 which is ignored.  The vertical view is using the CSS rules at index 2, so the problem doesn't occur.  Because both views share the same CSS rules so we need to delete the rules at index 2 so that when you edit the markup in the editor, the CSS rules at index 1 are updated:</p>
+<pre lang="jscript">// FM: We have to clear the CSS rules of the last style sheet so that the preview
+// is responsive to changes in the <style> section of the editor.
+</style>
+function clearSpuriousStyle() {
+    let i = document.styleSheets.length;
+    let ss = document.styleSheets[i - 1];
+
+    if (i &gt; 1) {
+        while (ss.rules.length &gt; 0) {
+            ss.deleteRule(0);
+        }
+    }
+}
+<p>This is a real kludge -- it gets executed for every keystroke and is probably buggy.</p>
+</pre>
+<p>and that's what <code>clearSpuriousStyle</code> does and is why this is called "FM" (figure it out.)</p>
+<h4><a name="32">Trick: Tab and Encoding Keys</a></h4>
+<p>Tabs are easy to handle in the <code>keydown</code> event:</p>
+<pre lang="jscript">function editorKeyDown(event, editor, preview) {
+    altKeyDown = event.altKey;
+    ctrlKeyDown = event.ctrlKey;
+
+    if (event.keyCode == 9 &amp;&amp; !event.shiftKey) {
+        insertTab(editor, preview);
+        event.preventDefault();
+    } else if (event.keyCode == 9 &amp;&amp; event.shiftKey) {
+        removeTab(editor, preview);
+        event.preventDefault();
+    }
+
+    insideCodeBlockHandling(event, editor, preview);
+}
+</pre>
+<p>However, I've added a feature that automatically converts characters that would otherwise be treated as markup to their encoded HTML equivalents:</p>
+<pre lang="jscript">function insideCodeBlockHandling(event, editor, preview) {
+    // Map to encoded HTML if inside a code or pre block.
+    let start = $(editor)[0].selectionStart;
+    let editorText = $(editor).val();
+    let s1 = editorText.substring(0, start);
+
+    if (inTag(s1, 'pre') || inTag(s1, 'code')) {
+        let char = mapKeyPressToActualCharacter(event.originalEvent.shiftKey, event.which);
+        let echar = $(editor).html(char).html();            
+
+        if (char != echar) {
+            let end = $(editor)[0].selectionEnd;
+            let s2 = editorText.substring(end);
+            let newText = s1 + echar + s2;
+            $(editor).val(newText);
+            let curPos = s1.length + echar.length;
+            $(editor)[0].selectionStart = curPos;
+            $(editor)[0].selectionEnd = curPos;
+            $(preview).html(newText);
+            event.preventDefault();
+        }
+    }
+}
+</pre>
+<p>The function <code>mapKeyPressToActualCharacter</code> comes from this SO post: <a href="https://stackoverflow.com/a/22975675/2276361">https://stackoverflow.com/a/22975675/2276361</a>.</p>
+<p>With this code, if I'm typing outside of a <code>pre</code> or <code>code</code> block, characters like &lt;, &gt; and &amp; appear as those actual characters, whereas when I'm typing inside a <code>code</code> or <code>pre</code> block, they are encoded into <code>&amp;lt;, &amp;gt;, and &amp;amp;</code>.  This adds some (but not perfect) smarts to the editor so I don't have to think about the encoding as I type.  Normally, as a pure code editor, those characters would always be HTML encoded, but since the editor supports actual HTML elements, I implemented this as a way to handle both the scenarios of using the editor to write articles and using the editor for playing around with HTML layouts.</p>
+<p>This same "trick" is used when pasting which is particularly useful when pasting code fragments:</p>
+<pre lang="jscript">function onPaste(event, editor, preview) {
+    let ret = true;
+    let clippy = event.originalEvent.clipboardData;
+    let textItems = Object.filter(clippy.items, item =&gt; item.kind == 'string' &amp;&amp; item.type == 'text/plain');
+
+    if (Object.getOwnPropertyNames(textItems).length == 1) {
+        let start = $(editor)[0].selectionStart;
+        let end = $(editor)[0].selectionEnd;
+        let editorText = $(editor).val();
+        let s1 = editorText.substring(0, start);
+        let s2 = editorText.substring(end);
+        let text = clippy.getData('text/plain');
+
+        // Now we have to check if we're inside a &lt;code&gt; or &lt;pre&gt; block, as these
+        // need to be encoded so that &lt; becomes &lt; etc.  Otherwise we assume the user
+        // is pasting a real HTML element.  Note that we don't check for closing &lt;/code&gt; or &lt;/pre&gt; tags to the right
+        // of the current position, as the user may not have created these yet. 
+
+        if (inTag(s1, 'pre') || inTag(s1, 'code')) {
+            text = $(editor).html(text).html();            
+        }
+
+        let newText = s1 + text + s2;
+        $(editor).val(newText);
+        let curPos = s1.length + text.length;
+        $(editor)[0].selectionStart = curPos;
+        $(editor)[0].selectionEnd = curPos;
+        $(preview).html(newText);
+        ret = false;
+    }
+
+    return ret;
+}
+</pre>
+<p>where <code>inTag</code> is defined as:</p>
+<pre lang="jscript">// Returns true if the text contains a final open tag but not the closing tag.
+// Open tag can be of the form "&lt;tag&gt;" or "&lt;tag " (note space)
+function inTag(s, tag) {
+    let tagOpen = '&lt;' + tag + '&gt;';
+    let tagAltOpen = '&lt;' + tag + ' ';
+    let tagClose = '&lt;/' + tag + '&gt;';
+    let idxOpen = s.lastIndexOf(tagOpen);
+    let idxAltOpen = s.lastIndexOf(tagAltOpen);
+    let idxClose = s.lastIndexOf(tagClose);
+
+    return idxOpen &gt; idxClose || idxAltOpen &gt; idxClose;
+}
+</pre>
+<h4><a name="33">Table of Contents Generation</a></h4>
+<p>I also wanted TOC generation built into the editor, so here it is:</p>
+<pre lang="jscript">// Will be fooled by putting &lt;h&gt; tags into quoted strings.
+function generateTOC() {
+    let toc = '&lt;ul&gt;';
+    let text = $(currentEditor).val().toLowerCase();
+    let originalText = $(currentEditor).val();
+    let level = 1;
+    // Next opening &lt;h[n]&gt; tag in the text.
+    let idx = text.indexOf('&lt;h');
+    let n = 0;      // href tag.
+    // index into original text, for getting the header without toLowerCase
+    // and to insert the &lt;a name&gt; and &lt;/a&gt; tags.
+    let q = 0;      
+
+    while (idx != -1) {
+        let cnum = text[idx + 2];
+        let num = undefined;
+
+        // If it's really of the form &lt;h[n]...
+        if (!isNaN(num = parseInt(cnum, 10))) {
+            // indent or outdent to the new level.
+            while (num &gt; level) {
+                toc = toc + '&lt;ul&gt;';
+                ++level;
+            }
+
+            while (num &lt; level) {
+                toc = toc + '&lt;/ul&gt;';
+                --level;
+            }
+
+            idx += 4;
+            q += idx;
+
+            // Remove the &lt;a name&gt; and closing &lt;/a&gt; if it already exists.
+            if (originalText.substring(q, q + '&lt;a name="'.length) == '&lt;a name="') {
+                // remove the &lt;a name&gt; and &lt;/a&gt; from the original text...
+                originalText = removeAName(originalText, q);
+                // ... and the working text.
+                text = removeAName(text, idx);
+            }
+
+            // Get the body of the header.
+            let hdr = text.substring(idx);
+            hdr = originalText.substring(q, q + hdr.indexOf('&lt;/'));
+            toc = toc + '&lt;li&gt;&lt;a href="#' + n.toString() + '"&gt;' + hdr + '&lt;/a&gt;&lt;/li&gt;';
+
+            // Insert the &lt;a name&gt; and closing &lt;/a&gt; around the header text.
+            let s1 = originalText.substring(0, q);
+            let s2 = originalText.substring(q + hdr.length);
+            let aname = '&lt;a name="' + n.toString() + '"&gt;' + hdr + '&lt;/a&gt;';
+            originalText = s1 + aname + s2;
+            q += aname.length + '&lt;/hn&gt;'.length;
+            ++n;
+
+            // Update the index to just past &lt;/h[n]&gt;
+            let hdrLen = hdr.length + '&lt;/hn&gt;'.length;
+            idx += hdrLen; 
+        } else {
+            // Skip whatever the &lt;h thing is we found.
+            idx += 2;  
+            q += 2;
+        }
+
+        text = text.substring(idx);
+        idx = text.indexOf('&lt;h');
+    }
+
+    // Close off the ul's.
+    while (level &gt; 0) {
+        toc = toc + '&lt;/ul&gt;';
+        --level;
+    }
+
+    // Update the preview with the &lt;a name&gt; tags.
+    $(currentPreview).html(originalText);
+    // Then set the #toc div.
+    $("#toc").html(toc);
+    // Then update the editor text.
+    updateSource();
+}
+</pre>
+<p>And the helper function to remove existing <code>&lt;a name&gt;</code> and <code>&lt;/a&gt;</code> tags that are part of the headers:</p>
+<pre lang="jscript">function removeAName(text, idx) {
+    s1 = text.substring(0, idx);
+    anameIdx = idx + text.substring(idx).indexOf('"&gt;') + 2;
+    s2 = text.substring(anameIdx);
+    hdr = s2.substring(0, s2.indexOf('&lt;/a&gt;'));
+    s3 = s2.substring(hdr.length + '&lt;/a&gt;'.length);
+    text = s1 + hdr + s3;
+
+    return text;
+}
+</pre>
+<h2><a name="34">Conclusion</a></h2>
+<p>This editor is still very much in its prototype stages, however I did write the entire article using this editor, so it is actually quite useful.  And as mentioned in the introduction, you can run the code in Visual Studio Code using Quick HTML Previewer!</p>

@@ -284,6 +284,7 @@
         <button class='__showVertical'>Vertical</button>
         <button class='__clearEditors'>Clear</button>
         <button class='__save'>Save</button>
+        <button class='__toc'>TOC</button>
     </div>
 
     <div class='__hidden' id = '__sourcePropertiesContainer'>
@@ -389,6 +390,7 @@ function wireUpEvents() {
     $('.__showVertical').click(() => showVerticalLayout());
     $('.__clearEditors').click(() => clearEditors());
     $('.__save').click(() => save());
+    $('.__toc').click(() => generateTOC());
 
     // Handle CR
     $('.__propertyName').keypress((event) => propertyNameKeyPress(event));
@@ -426,6 +428,12 @@ var tagSections = [
     {tag: 'div', sections: ['Dimensions', 'Margins', 'Padding', 'Border']},
     {tag: 'ul', sections: ['Margins', 'Padding', 'Border']},
     {tag: 'li', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'a', sections: []},
+    {tag: 'h1', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'h2', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'h3', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'h4', sections: ['Margins', 'Padding', 'Border']},
+    {tag: 'h5', sections: ['Margins', 'Padding', 'Border']},
 ];
 
 function setupSourcePropertiesContainer() {
@@ -512,17 +520,15 @@ function onCheckbox(event) {
 
 function onInputKeyPress(event) {
     if (event.keyCode == 13) {
-        let elName = '#' + event.target.id;
-        let el = $(elName);
-        let attr = $(el).attr('cssName');
-        let val = el.val();
-        $(selectedElement).css(attr, val);       
-        updateSource();
-        updateOtherPropertyGrid(elName, val);
+        updateElementStyle(event);
     }
 }
 
 function onUpdateElementStyle(event) {
+    updateElementStyle(event);
+}
+
+function updateElementStyle(event) {
     let elName = '#' + event.target.id;
     let el = $(elName);
     let attr = $(el).attr('cssName');
@@ -656,7 +662,7 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
 
                 if (map.toggle) {
                     toggleTags(editor, preview, map.insert[0], map.insert[1], editorText, s1, between, s2, start, end);
-                } else {
+                } else if (map.insert) {
                     insertTags(editor, preview, map.insert[0], map.insert[1], s1, between, s2, end, map.eoi);
                 }
 
@@ -669,20 +675,23 @@ function editorKeyPress(event, sourceEditor, targetPreview) {
             switch(key) {            
             }
         }
-        */
+        */ 
     } else {
-        clearStyles();
+        clearSpuriousStyle(); 
         preview.html(editorText);
     }
 }
 
 // FM: We have to clear the CSS rules of the last style sheet so that the preview
 // is responsive to changes in the <style> section of the editor.
-function clearStyles() {
+function clearSpuriousStyle() {
     let i = document.styleSheets.length;
     let ss = document.styleSheets[i - 1];
-    while (ss.rules.length > 0) {
-        ss.deleteRule(0);
+
+    if (i > 1) {
+        while (ss.rules.length > 0) {
+            ss.deleteRule(0);
+        }
     }
 }
 
@@ -834,6 +843,10 @@ function editorKeyDown(event, editor, preview) {
         event.preventDefault();
     }
 
+    insideCodeBlockHandling(event, editor, preview);
+}
+
+function insideCodeBlockHandling(event, editor, preview) {
     // Map to encoded HTML if inside a code or pre block.
     let start = $(editor)[0].selectionStart;
     let editorText = $(editor).val();
@@ -905,57 +918,67 @@ function clearProperties() {
 function showAllowableSections(tagName) {
     let lcTagName = tagName.toLowerCase();
     let sectionNames = sections.map(s => s.name);
-    let allowableSections = tagSections.filter(s => s.tag == lcTagName)[0].sections;
+    let section = tagSections.filter(s => s.tag == lcTagName)[0];
 
-    sectionNames.forEach(sn => {
-        let sectionName = '.__sectionName' + sn;
-        let contentName = '.__content' + sn;
-        if (allowableSections.includes(sn)) {
-            $(sectionName).removeClass('__hidden');
+    if (section) {
+        let allowableSections = section.sections;
 
-            // Restore state when section can be displayed.
-            if (sectionContentVisible[contentName]) {
-                $(contentName).removeClass('__hidden');
+        sectionNames.forEach(sn => {
+            let sectionName = '.__sectionName' + sn;
+            let contentName = '.__content' + sn;
+            if (allowableSections.includes(sn)) {
+                $(sectionName).removeClass('__hidden');
+
+                // Restore state when section can be displayed.
+                if (sectionContentVisible[contentName]) {
+                    $(contentName).removeClass('__hidden');
+                } else {
+                    $(contentName).addClass('__hidden');
+                }
             } else {
+                // always hide if excluded.
+                $(sectionName).addClass('__hidden');
                 $(contentName).addClass('__hidden');
             }
-        } else {
-            // always hide if excluded.
-            $(sectionName).addClass('__hidden');
-            $(contentName).addClass('__hidden');
-        }
-    });
+        });
+    } else {
+        clearProperties();        
+    }
 }
 
 function populateStyleValues(el, tagName) {
     let lcTagName = tagName.toLowerCase();
     let sectionNames = sections.map(s => s.name);
-    let allowableSections = tagSections.filter(s => s.tag == lcTagName)[0].sections;
+    let section = tagSections.filter(s => s.tag == lcTagName)[0];
 
-    allowableSections.forEach(s =>
-    {
-        if (sections.filter(section => section.name == s).length > 0) {
-            let sectionStyles = sections.filter(section => section.name == s)[0].styles;
+    if (section) {
+        let allowableSections = section.sections;
 
-            sectionStyles.forEach(sectStyle =>
-            {
-                let inputElement = '#__inputProperty' + sectStyle.style;
+        allowableSections.forEach(s =>
+        {
+            if (sections.filter(section => section.name == s).length > 0) {
+                let sectionStyles = sections.filter(section => section.name == s)[0].styles;
 
-                if (sectStyle.control == 'checkbox') {
-                    let attr = sectStyle.style;
-                    let checked = $(el).prop(attr);
-                    $(inputElement + 'h').prop('checked', checked);       
-                    $(inputElement + 'v').prop('checked', checked);       
-                } else {
-                    let styleValue = $(el).css(sectStyle.style);
-                    $(inputElement + 'h').val(styleValue);
-                    $(inputElement + 'v').val(styleValue);
-                }
-            });
-        } else {
-            console.log('Section ' + s + ' is not defined.');
-        }
-    });
+                sectionStyles.forEach(sectStyle =>
+                {
+                    let inputElement = '#__inputProperty' + sectStyle.style;
+
+                    if (sectStyle.control == 'checkbox') {
+                        let attr = sectStyle.style;
+                        let checked = $(el).prop(attr);
+                        $(inputElement + 'h').prop('checked', checked);       
+                        $(inputElement + 'v').prop('checked', checked);       
+                    } else {
+                        let styleValue = $(el).css(sectStyle.style);
+                        $(inputElement + 'h').val(styleValue);
+                        $(inputElement + 'v').val(styleValue);
+                    }
+                });
+            } else {
+                console.log('Section ' + s + ' is not defined.');
+            }
+        });
+    }
 }
 
 function showVerticalLayout() {
@@ -1003,6 +1026,7 @@ function download(filename, text) {
 
 function demo() {
     let demoText="<style>\np {\n  margin: 0px 0px 0px 5px;\n}\n.mydiv {\n  background-color: red;\n  margin: 5px;\n</style>\n<p id='hi'>Hello World!</p><div class='mydiv' id='div'>DIV Content</div><input value='An Input'></input>";
+    // let demoText = '<div id="toc"></div>\n<h1>Header1</h1><h2>Header2</h2><h3>Header3</h3><h1>H1-1</h1><h2>H1-2</h2>';
     $('#__editorv').val(demoText);
     $('#__previewv').html(demoText);
     $('#__editorh').val(demoText);
@@ -1037,6 +1061,98 @@ function copy(esource, etarget) {
         // And remove all occurrances, to be safe.
         $("[__hv__ = '42']").removeAttr('__hv__');
     }
+}
+
+// Will be fooled by putting <h> tags into quoted strings.
+function generateTOC() {
+    let toc = '<ul>';
+    let text = $(currentEditor).val().toLowerCase();
+    let originalText = $(currentEditor).val();
+    let level = 1;
+    // Next opening <h[n]> tag in the text.
+    let idx = text.indexOf('<h');
+    let n = 0;      // href tag.
+    // index into original text, for getting the header without toLowerCase
+    // and to insert the <a name> and </a> tags.
+    let q = 0;      
+
+    while (idx != -1) {
+        let cnum = text[idx + 2];
+        let num = undefined;
+
+        // If it's really of the form <h[n]...
+        if (!isNaN(num = parseInt(cnum, 10))) {
+            // indent or outdent to the new level.
+            while (num > level) {
+                toc = toc + '<ul>';
+                ++level;
+            }
+
+            while (num < level) {
+                toc = toc + '</ul>';
+                --level;
+            }
+
+            idx += 4;
+            q += idx;
+
+            // Remove the <a name> and closing </a> if it already exists.
+            if (originalText.substring(q, q + '<a name="'.length) == '<a name="') {
+                // remove the <a name> and </a> from the original text...
+                originalText = removeAName(originalText, q);
+                // ... and the working text.
+                text = removeAName(text, idx);
+            }
+
+            // Get the body of the header.
+            let hdr = text.substring(idx);
+            hdr = originalText.substring(q, q + hdr.indexOf('</'));
+            toc = toc + '<li><a href="#' + n.toString() + '">' + hdr + '</a></li>';
+
+            // Insert the <a name> and closing </a> around the header text.
+            let s1 = originalText.substring(0, q);
+            let s2 = originalText.substring(q + hdr.length);
+            let aname = '<a name="' + n.toString() + '">' + hdr + '</a>';
+            originalText = s1 + aname + s2;
+            q += aname.length + '</hn>'.length;
+            ++n;
+
+            // Update the index to just past </h[n]>
+            let hdrLen = hdr.length + '</hn>'.length;
+            idx += hdrLen; 
+        } else {
+            // Skip whatever the <h thing is we found.
+            idx += 2;  
+            q += 2;
+        }
+
+        text = text.substring(idx);
+        idx = text.indexOf('<h');
+    }
+
+    // Close off the ul's.
+    while (level > 0) {
+        toc = toc + '</ul>';
+        --level;
+    }
+
+    // Update the preview with the <a name> tags.
+    $(currentPreview).html(originalText);
+    // Then set the #toc div.
+    $("#toc").html(toc);
+    // Then update the editor text.
+    updateSource();
+}
+
+function removeAName(text, idx) {
+    s1 = text.substring(0, idx);
+    anameIdx = idx + text.substring(idx).indexOf('">') + 2;
+    s2 = text.substring(anameIdx);
+    hdr = s2.substring(0, s2.indexOf('</a>'));
+    s3 = s2.substring(hdr.length + '</a>'.length);
+    text = s1 + hdr + s3;
+
+    return text;
 }
 
 // https://stackoverflow.com/a/22975675/2276361
