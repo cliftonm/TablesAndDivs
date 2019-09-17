@@ -1,0 +1,4 @@
+Read about modules (namespaces) and export here:
+
+https://stackoverflow.com/questions/32805559/typescript-es6-import-module-file-is-not-a-module-error
+

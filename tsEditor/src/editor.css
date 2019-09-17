@@ -1,0 +1,159 @@
+/* https://developer.mozilla.org/en-US/docs/Web/CSS/Using_CSS_custom___properties */
+:root {
+    --__propertyWidth: 280px;  /* TODO: Why is this not equal to plw + pfw? */
+    --__toolbarHeight: 30px;
+    --__propertyLabelWidth: 120px;
+    --__propertyFieldWidth: 115px;
+}
+body {
+    padding:0; 
+    margin:0;
+}
+
+textarea {
+    border-style:none;
+}
+
+.__noborders {
+    border-collapse: collapse;    
+}
+
+.__border1 {
+    border-style:solid;
+    border-width: 1px;
+}
+
+.__vscroll {
+    overflow-y:scroll;
+}
+
+.__fullscreen {
+    width:calc(100% - 5px); 
+    height:calc(100vh - 35px); /* why can't I use var(--toolbarHeight) ? */
+    padding: 0;
+    margin: 0;
+}
+
+.__editorhw {
+    width: calc(100% - var(--__propertyWidth));
+}
+
+.__properties {
+    width: var(--__propertyWidth);
+}
+
+.__taeditorh {
+    /* compensate for padding so we can see the cursor on the left margin */
+    height: calc(100% - 4px);
+    width: calc(100% - 4px); 
+    resize: none;
+    padding: 1;
+    margin: 0;
+    white-space:normal;   /* or auto? */
+    overflow: auto;
+}
+
+.__taeditorv {
+    /* compensate for padding so we can see the cursor on the left margin */
+    height: calc(100% - 4px);
+    width: calc(100% - 4px); 
+    resize: none;
+    padding: 1;
+    margin: 0;
+    white-space:normal;   /* or auto? */
+    overflow: auto;
+}
+
+.__h100p {
+    height: 100%;
+}
+
+.__text-bold {
+    font-weight: bold;
+}
+
+.__mw1px {
+    max-width: 1px;
+}
+
+.__preview {
+    overflow: auto;
+    white-space: normal;
+}
+
+.__fixed {
+    table-layout: fixed;
+}
+
+.__fill {
+    width:100%; 
+    height:100%;
+}
+
+.__vamiddle {
+    vertical-align: middle;
+}
+
+.__toolbar {
+    height: var(--__toolbarHeight);
+    width: 100%;
+    padding-left: 5px;
+}
+
+.__parent {display: table;}
+
+.__child-top-left {
+    display: table-cell;
+}
+
+.__child-middle-left {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: left;
+}
+
+.__child-middle-center {
+    display: table-cell;
+    vertical-align: middle;
+    text-align: center;
+}
+
+.__child-bottom-right {
+    display: table-cell;
+    vertical-align: bottom;
+    text-align: right;
+}
+
+.__hidden {
+    display: none;
+}
+
+.__propertyLabel {
+    float: left;   /* without this, width is ignored */
+    width: var(--__propertyLabelWidth);
+}
+
+.__inputPropertyField {
+    width: var(--__propertyFieldWidth);
+    margin-left: 5px;
+}
+
+.__checkboxPropertyField {
+    margin-left: 5px;
+}
+
+.__propertyItem {
+    margin-bottom:3px;
+    padding-left: 5px;
+}
+
+.__section {
+    background-color: #ddd;
+    margin-top: 7px;
+    margin-bottom: 3px;
+}
+
+.__sectionBar {
+    padding-left: 5px;
+    padding-bottom: 1px;
+}
