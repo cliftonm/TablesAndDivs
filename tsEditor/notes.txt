@@ -2,3 +2,34 @@ Read about modules (namespaces) and export here:
 
 https://stackoverflow.com/questions/32805559/typescript-es6-import-module-file-is-not-a-module-error
 
+Glup vs. WebPack vs. Grunt:
+
+https://www.toptal.com/front-end/webpack-browserify-gulp-which-is-better
+https://da-14.com/blog/gulp-vs-grunt-vs-webpack-comparison-build-tools-task-runners/
+
+
+Integrating Gulp:
+https://code.visualstudio.com/docs/editor/tasks
+
+Other links:
+
+https://medium.com/@PhilippKief/how-to-debug-typescript-with-vs-code-9cec93b4ae56
+
+in launch.json, probably don't need this:
+https://github.com/microsoft/vscode-chrome-debug/issues/900
+            "sourceMapPathOverrides": {
+                "webpack:/*": "${webRoot}/*",
+                "/./*": "${webRoot}/*",
+                "/src/*": "${webRoot}/*",
+                "/*": "*",
+                "/./~/*": "${webRoot}/node_modules/*"
+            }            
+
+Debugger for Chrome:
+https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome
+
+
+https://marketplace.visualstudio.com/items?itemName=msjsdiag.debugger-for-chrome
+Specifically: If your breakpoints aren't hit, it's most likely a sourcemapping issue or because you are having breakpoints in immediately executed code.
+
+

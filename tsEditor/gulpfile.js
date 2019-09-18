@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+// var sourcemaps = require('gulp-sourcemaps');
 var browserify = require('browserify');
 var source = require('vinyl-source-stream');
 var watchify = require('watchify');
@@ -28,6 +29,7 @@ var watchedBrowserify = watchify(browserify({
 
 gulp.task('copy-html', function () {
     return gulp.src(paths.pages)
+        // .pipe(sourcemaps.write())
         .pipe(gulp.dest('dist'));
 });
 

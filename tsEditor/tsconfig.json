@@ -8,6 +8,9 @@
     ],
     "compilerOptions": {
         "noImplicitAny": true,
-        "target": "es6"
+        "target": "es6",
+        "sourceMap": true,
+        "rootDir": "./src",
+        "outDir": "./dist"
     }
 }

@@ -12,6 +12,8 @@ npm install --save-dev watchify fancy-log
 npm install --save-dev @types/jquery
 npm install --save jquery
 
+-- May not be necessary?  Don't know:
+npm i gulp-sourcemaps                         
 
 With ES6 target, this:
 
@@ -20,6 +22,8 @@ import $ = require("jquery");
 is not valid.  Must use this form instead:
 
 import * as $ from "jquery";
+
+Install Debugger for Chrome in VS Code
 
 
 
