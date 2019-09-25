@@ -1,0 +1,70 @@
+<html>
+
+<head>
+<meta http-equiv="Content-Language" content="en-us">
+<meta http-equiv="Content-Type" content="text/html; charset=windows-1252">
+<title>Introduction</title>
+</head>
+
+<body>
+
+<h2>Introduction</h2>
+<p>Reality - most everything out there seems to be half-baked in the hot summer sun piles 
+of cow you-know-what.&nbsp; And such is my experience trying to get client-side TypeScript to work with proper debugging as I ported my 
+<a href="https://www.codeproject.com/Articles/5246003/HTML-Editor-with-Live-Preview-and-Style-Playground">HTML editor</a> to TypeScript.&nbsp; 
+(Note, this is <b>not</b> TypeScript's fault!)</p>
+<p>Cow Pile #1: The Chrome Debugger Extension in Visual Studio Code simply does 
+not work if you put source code into sub-folders.&nbsp; And this problem has 
+been reported since 2018 at least but the only viable solution is, add <code>debugger;</code> 
+to the entry point of your TypeScript code and then </code>restore all breakpoints</code>.&nbsp; 
+What bull.&nbsp; Sh...</p>
+<p>Cow Pile #2: To even be able to run the code in Visual Studio Code, you'll 
+need some build process that bundles all the transpiled TypeScript.&nbsp; What?</p>
+<p>OK, on piles #1 and #2, I was not able to figure out any other solutions.</p>
+<p>Cow Pile #3: Visual Studio really wants you to drink the Kool-Aid and use 
+TypeScript in an ASP.NET or .NET Core solution.&nbsp; I however do not want to 
+drink the Kool-Aid and simply want a client-side solution.&nbsp; The only way to 
+create one is to load a TypeScript HTML Template which, after, much googling, I 
+found.</p>
+<p>Cow Pile #4: But it doesn't really work &quot;out of the box.&quot;&nbsp; You need 
+require.js.&nbsp; You need to set your module builder to the right setting.&nbsp; </p>
+<p>Cow Pile #5: But then, amazingly, it does work.&nbsp; Except you're left 
+figuring out, ok, how do I differentiate between development and production 
+code?&nbsp; How do I choose whether to bundle everything or nothing?&nbsp; Why 
+is my only option to bundle everything or nothing?&nbsp; </p>
+<p>Leaving me with the renewed impression: why do we leave software development 
+tooling to gnomes who live in a vast underground cave system filled with 
+bottomless pits, superbats, and the occasional Wumpus, and who clearly require 
+megadoses of Vitamin D because they never see the light of the sun and have a 
+clue as to what &quot;users&quot; (developers trying to get something done) actually need.</p>
+<p>So here's my journey in the underground labyrinth of client-side TypeScript 
+tooling and discovering unused tunnels back into the light.&nbsp; Hopefully 
+it'll save you some time if you decide to go on similar spelunking journeys.&nbsp; 
+I did not explore all the narrow recesses and tunnels, so maybe there are 
+shorter paths out there.&nbsp; If you find one, leave a map for others!</p>
+<h2>Visual Studio Code</h2>
+<p>There are so many &quot;editors&quot; out there, but the cave entrance I chose was 
+labeled &quot;Visual Studio Code.&quot;&nbsp; I mean, why not?&nbsp; I was already 
+familiar with it, and I really didn't want to spend the time figuring out how to 
+navigate other entrances, like <a href="https://www.jetbrains.com/webstorm/">
+WebStorm</a> (requires an entrance fee after 30 days unless you are a student of 
+arcane magic), <a href="https://atom.io/">Atom</a>, or
+<a href="https://www.sublimetext.com/">Sublime</a> (which I boarded up a few 
+months ago because it became unusable and was subject to cave-ins) and I was 
+dubious about the various trolls one has to befriend to get things beyond simple 
+editing to work.&nbsp; I leave that to other adventurers.&nbsp; I'd already 
+journeyed with some of the trolls for hire in the Visual Studio Code tavern, and 
+I'd rather travel with acquaintances than strangers, so the decision was made.</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+<p>&nbsp;</p>
+
+</body>
+
+</html>
